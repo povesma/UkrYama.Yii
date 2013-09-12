@@ -2,9 +2,9 @@
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'holes-form',
 	'enableAjaxValidation'=>false,
-	'htmlOptions'=>Array ('enctype'=>'multipart/form-data'),
-)); ?>
-<?php echo $form->errorSummary($model); ?>
+	'htmlOptions'=>array('enctype'=>'multipart/form-data'),
+)); 
+echo $form->errorSummary($model); ?>
 
 	<? /*<input type="hidden" name="ID" value="<?= $F['ID']['VALUE'] ?>">
 	 if($F['FIX_ID']): ?>
@@ -20,19 +20,19 @@
 				<div class="step_number clear">
 					<span class="clear">1</span>
 				</div>
-				<p>Добавьте фотографию дефекта и введите основные параметры <span>(адрес, фото, описание)</span></p>
+				<p><?php echo Yii::t('template', 'HOW_ADD_STEP1')?></p>
 			</li>
 			<li class="step_2 clear">
 				<div class="step_number clear">
 					<span class="clear">2</span>
 				</div>
-				<p>Отправьте автоматически сгенерированное письмо в местное ГАИ. Не забудьте вписать свои личные данные.</p>
+				<p><?php echo Yii::t('template', 'HOW_ADD_STEP2')?></p>
 			</li>
 			<li class="step_3 clear">
 				<div class="step_number clear">
 					<span class="clear">3</span>
 				</div>
-				<p>Через 31 дней загрузите фото отремонтированной ямы или отправьте жалобу в прокуратуру</p>
+				<p><?php echo Yii::t('template', 'HOW_ADD_STEP3')?></p>
 			</li>
 		</ul>
 	</div>
@@ -55,10 +55,10 @@
 			<div class="ya_map">
 				<div class="bx-yandex-search-layout wide" style="padding-bottom: 0px;">
 					<div class="bx-yandex-search-form" style="padding-bottom: 0px;">				
-							<p>Введите адрес места для быстрого поиска</p>
+							<p><?php echo Yii::t('template', 'ENTER_ADDRES_FOR_SEARCH')?></p>
 							<input type="text" id="address_inp" name="address" class="textInput" value="" style="width: 300px;" />
-							<input type="submit" value="Искать" onclick="jsYandexSearch_MAP_DzDvWLBsil.searchByAddress($('#address_inp').val()); return false;" />
-							<a style="display:none;" id="clear_result_link" href="#" onclick="clearSerchResults('MAP_DzDvWLBsil', JCBXYandexSearch_arSerachresults); document.getElementById('address_inp').value=''; return false;">Очистить</a>				
+							<input type="submit" value="<?php echo Yii::t('template', 'SEARCH')?>" onclick="jsYandexSearch_MAP_DzDvWLBsil.searchByAddress($('#address_inp').val()); return false;" />
+							<a style="display:none;" id="clear_result_link" href="#" onclick="clearSerchResults('MAP_DzDvWLBsil', JCBXYandexSearch_arSerachresults); document.getElementById('address_inp').value=''; return false;"><?php echo Yii::t('template', 'CLEAR')?></a>				
 					</div>		
 					<div class="full_adress">
 						<div class="bx-yandex-search-results" id="results_MAP_DzDvWLBsil"></div>
@@ -66,13 +66,14 @@
 				</div>	
 				<div class="f">
 					<div class="full_adress">
-						<span id="recognized_address_str" title="Субъект РФ и населённый пункт"></span>
+						<span id="recognized_address_str" title="<?php echo Yii::t('template', 'SELECTED_REGION')?>"></span>
 						<span id="other_address_str"></span>	
 					</div>	
 					<div class="bx-yandex-view-layout">
 						<div class="bx-yandex-view-map">
-							<?php if ($model->isNewRecord) $maptype='addhole'; else $maptype='updatehole'; ?>
-							<?php Yii::app()->clientScript->registerScript('initmap',<<<EOD
+							<?php 
+                     $maptype =$model->isNewRecord ? 'addhole' : 'updatehole'; 
+							Yii::app()->clientScript->registerScript('initmap',<<<EOD
 							if (window.attachEvent) // IE
 								window.attachEvent("onload", function(){init_MAP_DzDvWLBsil(null,'{$maptype}')});
 							else if (window.addEventListener) // Gecko / W3C
@@ -90,7 +91,7 @@ EOD
 							$this->widget('application.extensions.ymapmultiplot.YMapMultiplot', array(
 									'key'=>$this->mapkey,
 								   'id' => 'BX_YMAP_MAP_DzDvWLBsil',//id of the <div> container created
-								   'label' => 'Тест', //Title for bubble. Used if you are plotting multiple locations of same business
+								   //'label' => 'Тест', //Title for bubble. Used if you are plotting multiple locations of same business
 								   'address' =>  Array(), //Array of AR objects
 								   'width'=>'100%',
 								   'height'=>'400px',						   
@@ -103,14 +104,13 @@ EOD
 
 				</div>
 				<?
-				if(!$model->isNewRecord && $model->pictures_fresh && $model->STATE!='fixed' && !$model->GIBDD_REPLY_RECEIVED)
+				if(!$model->isNewRecord && $model->pictures_fresh && $model->STATE!=Holes::STATE_FIXED && !$model->GIBDD_REPLY_RECEIVED)
 				{
 					?>
-					<div id="overshadow"><span class="command" onclick="document.getElementById('picts').style.display=document.getElementById('picts').style.display=='block'?'none':'block';">Можно удалить загруженные фотографии</span><div class="picts" id="picts"><?
-					foreach($model->pictures_fresh as $i=>$picture)
-					{				
-						echo '<br>'.$form->checkBox($model,"deletepict[$i]",Array('class'=>'filter_checkbox','value'=>$picture->id)).' ';
-						echo $form->labelEx($model,"deletepict[$i]",Array('label'=>'Удалить фотографию?')).'<br><img src="'.$picture->medium.'"><br><br>';
+					<div id="overshadow"><span class="command" onclick="document.getElementById('picts').style.display=document.getElementById('picts').style.display=='block'?'none':'block';"><?php echo Yii::t('template', 'INFO_CANDELETEPHOTO')?></span><div class="picts" id="picts"><?
+					foreach($model->pictures_fresh as $i=>$picture){				
+						echo '<br>'.$form->checkBox($model,"deletepict[$i]", array('class'=>'filter_checkbox','value'=>$picture->id)).' ';
+						echo $form->labelEx($model,"deletepict[$i]", array('label'=>Yii::t('template', 'DELETEPICT'))).'<br><img src="'.$picture->medium.'"><br><br>';
 					}
 					echo '</div></div>';
 				} ?>
@@ -131,41 +131,62 @@ EOD
 				<?php echo $form->textField($model,'ADDRESS',array('class'=>'textInput')); ?>
 				<?php echo $form->error($model,'ADDRESS'); ?>	
 				<p class="tip">
-					Поставьте метку на карте двойным щелчком мыши
+               <?php echo Yii::t('template', 'ENTER_POINT_TO_MAP_DOBLECLICK')?>					
 				</p>
 			</div>
 		</div>
-	
-		
-		<!-- адрес -->
+
+		<!-- Отдел ГАИ -->
 		<div class="f clearfix">
 		<?php echo $form->labelEx($model,'gibdd_id'); ?>
 		<?php echo $form->dropDownList($model, 'gibdd_id', CHtml::listData( $model->territorialGibdd, 'id', 'gibdd_name' ));?>
 		<?php echo $form->error($model,'gibdd_id'); ?>
 		</div>
-
+	
 		<!-- тип дефекта -->
 		<div class="f clearfix">
 			<?php echo $form->labelEx($model,'TYPE_ID'); ?>
 
-		 	<!-- <?php echo $form->dropDownList($model, 'TYPE_ID', CHtml::listData( HoleTypes::model()->findAll(Array('condition'=>'published=1', 'order'=>'ordering')), 'id','name')); ?> -->
+			<ul class="defect_type clearfix"> 
+         <?php 
+				$data = CHtml::listData(HoleTypes::getTypes(), 'id','alias');
+				foreach($data as $id => $alias){
+				   $name = Yii::t('holes','HOLES_TYPE_'.strtoupper($alias));
 
-
-			<ul class="defect_type clearfix"> <?php 
-				$data = CHtml::listData( HoleTypes::model()->findAll(Array('condition'=>'published=1', 'order'=>'ordering')), 'id','name');
-				foreach($data as $id => $name){
-					print_r("<li><input type='radio' name='Holes[TYPE_ID]' value='".$id."' id='type_".$id."'><label for='type_".$id."'>".$name."</label></li>");
+               echo CHtml::tag('li', array(), 
+                  CHtml::radioButton(
+                     'Holes[TYPE_ID]', 
+                     $model->TYPE_ID == $id, 
+                     array('value'=>$id, 'id'=>'type_'.$alias)
+                  ).
+                  CHtml::label($name, 'type_'.$alias)                  
+               );
 				}
-			?> </ul>
+			?> 
+         </ul>
 
 			<?php echo $form->error($model,'TYPE_ID'); ?>
 		</div>
+	
 		
+		<!-- Дата обнаружения -->
+		<div class="f clearfix">
+		<?php echo $form->labelEx($model,'DATE_CREATED'); ?>
+      <?php echo CHtml::textField('defectdate', date(C_DATEFORMAT, $model->DATE_CREATED)); ?>
+		<?php echo $form->error($model,'DATE_CREATED'); ?>
+		</div>
+
+      <script>
+         $('#defectdate').datepicker({dateFormat: '<?php  echo C_DATEFORMAT_JS ?>'});
+      </script>
+         	
 		<!-- фотки -->
 		<div class="f clearfix">
 			<?php echo $form->labelEx($model,'upploadedPictures'); ?>
-			<?php $this->widget('CMultiFileUpload',array('accept'=>'gif|jpg|png', 'model'=>$model, 'attribute'=>'upploadedPictures', 'htmlOptions'=>array('class'=>'mf'), 'denied'=>Yii::t('mf','Невозможно загрузить этот файл'),'duplicate'=>Yii::t('mf','Файл уже существует'),'remove'=>Yii::t('mf','удалить'),'selected'=>Yii::t('mf','Файлы: $file'),)); ?>			
-			<p class="tip">Завантажуйте фото не більше 20 Мб. Загальний розмір не має перевижувати 50 Мб.</p>			
+			<?php $this->widget('CMultiFileUpload', array('accept'=>'gif|jpg|png', 'model'=>$model, 'attribute'=>'upploadedPictures', 'htmlOptions'=>array('class'=>'mf'), 'denied'=>Yii::t('mf','Невозможно загрузить этот файл'),'duplicate'=>Yii::t('mf','Файл уже существует'),'remove'=>Yii::t('mf','удалить'),'selected'=>Yii::t('mf','Файлы: $file'),)); ?>			
+			<p class="tip">
+            <?php echo Yii::t('template', 'ENTER_PHOTO_REMARK')?>	         
+         </p>			
 		</div>
 		
 		<!-- камент -->
@@ -181,9 +202,9 @@ EOD
 
 		<div class="addSubmit">
 			<div class="btn" onclick="$(this).parents('form').submit();">
-				<a class="addFact"><i class="text">Отправить</i><i class="arrow"></i></a>
+				<a class="addFact"><i class="text"><?php echo Yii::t('template', 'SEND')?></i><i class="arrow"></i></a>
 			</div>
-			<p>После нажатия на кнопку «Отправить» вы можете создать обращение о дефекте в виде pdf-документа, которое можно распечатать и отправить в ближайшее отделение ГАИ</p>
+			<p><?php echo Yii::t('template', 'INFO_AFTERSEND')?></p>
 		</div>
 	</div>
 	<!-- /левая колоночка -->

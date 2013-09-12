@@ -155,4 +155,20 @@ class HoleTypes extends CActiveRecord
                         ),
 		));
 	}
+   
+   public function getName(){
+      return Yii::t('holes','HOLES_TYPE_'.strtoupper($this->alias));    
+   }
+   
+   public static function getList(){
+      $list = CHtml::listData(self::getTypes(), 'id','alias');
+      if ($list) foreach ($list as $key=>$item){
+         $list[$key] = Yii::t('holes','HOLES_TYPE_'.strtoupper($item));      
+      }
+      return $list;         
+   }
+   
+   public static function getTypes(){
+      return self::model()->findAll(array('condition'=>'published = 1', 'order'=>'ordering'));
+   }
 }

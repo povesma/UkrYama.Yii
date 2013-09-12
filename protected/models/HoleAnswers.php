@@ -18,7 +18,7 @@ class HoleAnswers extends CActiveRecord
 	public $isimport=false; 
 	
 	public $firstAnswermodel;
-
+   
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -41,11 +41,19 @@ class HoleAnswers extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('request_id, date', 'required'),
-			array('request_id, date', 'numerical', 'integerOnly'=>true),
+			array('request_id, date, createdate', 'numerical', 'integerOnly'=>true),
+         
+         array('date', 'compare', 'compareValue'=>time(), 'operator'=>'<', 'allowEmpty'=>false , 
+            'message'=>Yii::t('template', 'DATE_CANT_BE_FUTURE'),
+         ),
+//         array('date', 'compare', 'compareValue'=>time() - (7 * 86400), 'operator'=>'>', 'allowEmpty'=>false , 
+//            'message'=>Yii::t('template', 'DATE_CANT_BE_PAST'),
+//         ),           
+         array('date', 'default', 'value'=>time(),'on'=>'insert'),
 			array('comment', 'length'),
 			array('uppload_files, results', 'safe'),
 			//Раскомментить после импорта
-			array('uppload_files', 'required', 'on'=>'insert', 'message' => 'Необходимо загрузить ответ ГАИ'),
+			array('uppload_files', 'required', 'on'=>'insert', 'message' => Yii::t('holes_view', 'NEED_UPLOAD_ANSWER')),
 			array('uppload_files', 'file', 'types'=>'jpg, jpeg, png, gif, txt, pdf','maxFiles'=>10,'allowEmpty'=>true),			
 			
 			// The following rule is used by search().
@@ -87,33 +95,35 @@ class HoleAnswers extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'request_id' => 'Request',
-			'date' => 'Date',
-			'comment' => 'Комментарии (по желанию)',
-			'uppload_files'=>'Необходимо добавить отсканированный ответ из ГАИ',
-			'results'=>'Фактический результат запроса'
+			'request_id' => Yii::t('template', 'REQUEST'),
+			'date' => Yii::t('template', 'RESPONSEDATE'),
+			'comment' => Yii::t('template', 'COMMENTS_IF_NEED'),
+			'uppload_files'=>Yii::t('template', 'INFO_NEED_ADD_SCAN_RESPONSE'),
+			'results'=>Yii::t('template', 'INFO_RESULT_OF_RESPONSE'),
+         'createdate'=>Yii::t('template', 'CREATEDATE'),
 		);
 	}
 	
 	public function getFilesFolder(){
-		return '/upload/st1234/answers/'.$this->request->hole->ID.'/'.$this->request->type;
+		return Yii::app()->params['imagePath'].'answers/'.$this->request->hole->ID.'/'.$this->request->type;
 	}	
 	
 	public function getuppload_files(){
 		if (!$this->isimport) return CUploadedFile::getInstancesByName('');
 		else return Array(123,321);
-	}
-	
+	}	
+   
 	public function afterSave()
 	{			
 		parent::afterSave();
 		
 		if ($this->scenario=="insert"){
+         $path = $_SERVER['DOCUMENT_ROOT'].Yii::app()->params['imagePath'];
 			$dir=$_SERVER['DOCUMENT_ROOT'].$this->filesFolder;
-			if (!is_dir($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/answers/'))
-				mkdir($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/answers/');
-			if (!is_dir($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/answers/'.$this->request->hole->ID))
-				mkdir($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/answers/'.$this->request->hole->ID);
+			if (!is_dir($path.'answers/'))
+				mkdir($path.'answers/');
+			if (!is_dir($path.'/answers/'.$this->request->hole->ID))
+				mkdir($path.'answers/'.$this->request->hole->ID);
 			if (!is_dir($dir))
 				mkdir($dir);
 			if (!is_dir($dir.'/thumbs'))
@@ -163,24 +173,33 @@ class HoleAnswers extends CActiveRecord
 				
 			}
 		}
-	}	
+	}
+   
+	public function beforeSave(){
+		parent::beforeSave();
+      if ($this->isNewRecord){
+         $this->createdate = time();   
+      }
+		return true;
+	}   	
 	
 	public function beforeDelete(){
 		parent::beforeDelete();
-		$this->results=Array();
+		$this->results = array();
 		$this->update();
-		foreach ($this->files as $file) $file->delete();
+		foreach ($this->files as $file) 
+         $file->delete();
 		return true;
 	}
 	
 	
 	public function afterDelete(){
 		parent::afterDelete();
-		$requests=CHtml::listData( $this->request->hole->requests_gibdd, 'id', 'id' );
+		$requests=CHtml::listData( $this->request->hole->requests_gibdd, 'id', 'id');
 		if (!count ($this->findAll('request_id IN ('.implode(',',$requests).')'))){						
 			$this->request->hole->STATE='inprogress';				
 			$this->request->hole->update();
-			}
+		}
 		return true;	
 	}	
 

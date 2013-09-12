@@ -18,29 +18,69 @@ return array(
 
 	// autoloading model and component classes
 	'import'=>array(
-		'application.models.*',
-		'application.components.*',
-		'application.classes.*',
-		'application.modules.userGroups.*',
-		'application.modules.userGroups.models.*',
-        'application.modules.userGroups.components.*',
-		'application.extensions.nestedset.*',
-		'application.extensions.fpdf.*',
-		'application.extensions.*',
-		'application.helpers.*',
-	    'ext.eoauth.*',
-		'ext.eoauth.lib.*',
-		'ext.lightopenid.*',
-		'ext.eauth.services.*',
-			),
-	'modules'=>array(		
-					
-			'userGroups'=>array(
-				'accessCode'=>'12345',
-				'salt'=>'111',				
-				'profile'=>Array('Profile')
-			)
-    ),
+      'application.models.*',
+      'application.components.*',
+      'application.classes.*',
+      'application.modules.userGroups.*',
+      'application.modules.userGroups.models.*',
+      'application.modules.userGroups.components.*',
+      'application.extensions.nestedset.*',
+      'application.extensions.fpdf.*',
+      'application.extensions.*',
+      'application.modules.comments.models.*',
+      'application.helpers.*',
+      'ext.eoauth.*',
+      'ext.eoauth.lib.*',
+      'ext.lightopenid.*',
+      'ext.eauth.services.*',
+   ),
+	'modules'=>array(							
+		'userGroups'=>array(
+			'accessCode'=>'12345',
+			'salt'=>'111',				
+			'profile'=>Array('Profile')
+		),
+		'comments'=>array(
+			//you may override default config for all connecting models
+			'defaultModelConfig' => array(
+      		//only registered users can post comments
+            'registeredOnly' => true,
+            'useCaptcha' => false,
+            //allow comment tree
+            'allowSubcommenting' => true,
+            //display comments after moderation
+            'premoderate' => false,
+            //action for postig comment
+            'postCommentAction' => 'comments/comment/postComment',
+            //super user condition(display comment list in admin view and automoderate comments)
+            'isSuperuser'=>'Yii::app()->user->isModer',
+      		//order direction for comments
+      		'orderComments'=>'ASC',					
+      	),
+      	//the models for commenting
+      	'commentableModels'=>array(
+      		//model with individual settings
+      		'Holes'=>array(
+      			'registeredOnly'=>true,
+      			'useCaptcha'=>false,
+      			'allowSubcommenting'=>true,
+      			//config for create link to view model page(page with comments)
+      			'pageUrl'=>array(
+      				'route'=>'holes/view',
+      				'data'=>array('id'=>'ID'),
+      			),
+      		),
+      		//model with default settings
+      		'ImpressionSet',
+      	),
+      	//config for user models, which is used in application
+      	'userConfig'=>array(
+      		'class'=>'UserGroupsUser',
+      		'nameProperty'=>'fullname',
+      		//'emailProperty'=>'email',
+      	),
+      ),
+   ),
 	// application components
 	'components'=>array(
 		'user'=>array(

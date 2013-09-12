@@ -109,15 +109,16 @@ class HolesController extends Controller
 	 */
 	public function actionView($id)
 	{
+      //$this->layout = '//layouts/header_blank';
+
 		$cs=Yii::app()->getClientScript();
-        $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/hole_view.css'); 
-        $cs->registerScriptFile('http://api-maps.yandex.ru/1.1/index.xml?key='.$this->mapkey);
-        $jsFile = CHtml::asset($this->viewPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'view_script.js');
-        $cs->registerScriptFile($jsFile);
+      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/hole_view.css'); 
+      $cs->registerScriptFile('http://api-maps.yandex.ru/1.1/index.xml?key='.$this->mapkey);
+      $jsFile = CHtml::asset($this->viewPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'view_script.js');
+      $cs->registerScriptFile($jsFile);
         
 		$this->render('view',array(
 			'hole'=>$this->loadModel($id),
-
 		));
 	}
 	
@@ -132,35 +133,43 @@ class HolesController extends Controller
 	 */
 	public function actionAdd()
 	{
+      $this->layout = '//layouts/header_blank';
 		$model=new Holes;
-
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
-		
+		$model->USER_ID = Yii::app()->user->id;	
+		$model->DATE_CREATED = time();        
 		$cs=Yii::app()->getClientScript();
-        $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
+      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
 
-		if(isset($_POST['Holes']))
-		{
-			$model->attributes=$_POST['Holes'];
-			$model->USER_ID=Yii::app()->user->id;	
-			$model->DATE_CREATED=time();
-			$subj=RfSubjects::model()->SearchID(trim($model->STR_SUBJECTRF));
-			if($subj) $model->ADR_SUBJECTRF=$subj;
-			else $model->ADR_SUBJECTRF=0;
+		if(isset($_POST['Holes'])){
+			$model->attributes = $_POST['Holes'];
+         
+         $model->DATE_CREATED = strtotime($_POST['defectdate']);
+         if (!$model->DATE_CREATED)
+            $model->DATE_CREATED = mktime(0, 0, 0, date("m")  , date("d"), date("Y"));
+			if ($model->DATE_CREATED < time()-(7 * 86400))
+            $model->addError("DATE_CREATED",Yii::t('template', 'DATE_CANT_BE_PAST', array('{attribute}'=>$model->getAttributeLabel('DATE_CREATED')))); 
+
+         $subj=RfSubjects::model()->SearchID(trim($model->STR_SUBJECTRF));
+			if($subj) 
+            $model->ADR_SUBJECTRF=$subj;
+			else 
+            $model->ADR_SUBJECTRF=0;
 			$model->ADR_CITY=trim($model->ADR_CITY);
 			
-			if (Yii::app()->user->level > 50) $model->PREMODERATED=1;
-			else $model->PREMODERATED=0;
-			
-			if ($model->validate()) {
-				if($model->save() && $model->savePictures())
+			$model->PREMODERATED = (Yii::app()->user->level > 50) ? 1 : 0; 
+
+         
+         $tran = $model->dbConnection->beginTransaction();
+			if ($model->validate(null, false)) {
+				if($model->save() && $model->savePictures()){
+               $tran->commit();
 					$this->redirect(array('view','id'=>$model->ID));
-				}
+            }               
+			}
 		}
 		else {
 			//выставляем центр на карте по координатам IP юзера
-			$request=new CHttpRequest;
+			$request = new CHttpRequest;
 			$geoIp = new EGeoIP();
 			$geoIp->locate($request->userHostAddress); 	
 			//echo ($request->userHostAddress);
@@ -204,23 +213,30 @@ class HolesController extends Controller
 		
 		$model=$this->loadChangeModel($id);
 		
-		if($model->STATE!='fresh')	
-			throw new CHttpException(403,'Доступ запрещен.');
+      if($model->STATE != Holes::STATE_FRESH)	
+         throw new CHttpException(403,'Редактирование не нового дефекта запрещено');
+
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 		$cs=Yii::app()->getClientScript();
-        $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
+      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
 
 		if(isset($_POST['Holes']))
 		{
 			$model->attributes=$_POST['Holes'];
+         $model->DATE_CREATED = strtotime($_POST['defectdate']);
+			if ($model->DATE_CREATED < time()-(7 * 86400))
+            $model->addError("DATE_CREATED",Yii::t('template', 'DATE_CANT_BE_PAST', array('{attribute}'=>$model->getAttributeLabel('DATE_CREATED')))); 
+
 			if ($model->STR_SUBJECTRF){
 				$subj=RfSubjects::model()->SearchID(trim($model->STR_SUBJECTRF));
 				if($subj) $model->ADR_SUBJECTRF=$subj;
 			}
-			if($model->save() && $model->savePictures())
-				$this->redirect(array('view','id'=>$model->ID));
+			if ($model->validate(null, false)) {
+   			if($model->save() && $model->savePictures())
+   				$this->redirect(array('view','id'=>$model->ID));
+         }
 		}
 
 		$this->render('update',array(
@@ -236,58 +252,77 @@ class HolesController extends Controller
 		$firstAnswermodel=Array();
 		$models=Array();
 		if (!$holes){
-		$model=$this->loadModel($id);
-		$model->scenario='gibdd_reply';
-		if($model->STATE!='inprogress' && $model->STATE!='achtung' && !$model->request_gibdd)	
-			throw new CHttpException(403,'Доступ запрещен.');
-		$models[]=$model;
+         $model=$this->loadModel($id);
+         $model->scenario='gibdd_reply';
+         if($model->STATE!=Holes::STATE_INPROGRESS && $model->STATE!=Holes::STATE_ACHTUNG && !$model->request_gibdd)	
+            throw new CHttpException(403,'Доступ запрещен.');
+         $models[]=$model;
 		}	
-		else $models=Holes::model()->findAllByPk(explode(',',$holes));
-		foreach ($models as $i=>$model){
-			if($model->STATE!='inprogress' && $model->STATE!='achtung' && !$model->request_gibdd) {unset ($models[$i]); continue;}
+		else{ 
+         $models=Holes::model()->findAllByPk(explode(',',$holes));
+      }
+		
+      foreach ($models as $i=>$model){
+			if($model->STATE!=Holes::STATE_INPROGRESS && $model->STATE!=Holes::STATE_ACHTUNG && !$model->request_gibdd) {
+			   unset ($models[$i]); continue;
+         }
 			$answer=new HoleAnswers;
+         $answer->date = time();
 			if (isset($_GET['answer']) && $_GET['answer'])
 				$answer=HoleAnswers::model()->findByPk((int)$_GET['answer']);
-				
+
 			$answer->request_id=$model->request_gibdd->id;
 	
-				if(isset($_POST['HoleAnswers']))
-				{					
-					$answer->attributes=$_POST['HoleAnswers'];
-					//if (isset($_POST['HoleAnswers']['results'])) $answer->results=$_POST['HoleAnswers']['results'];
-					$answer->request_id=$model->request_gibdd->id;
-					$answer->date=time();
-					if ($firstAnswermodel) $answer->firstAnswermodel=$firstAnswermodel;
-					if($answer->save()){
-						if ($model->STATE=="inprogress" || $model->STATE=="achtung")
-							$model->STATE='gibddre';
-						$model->GIBDD_REPLY_RECEIVED=1;
-						if (!$model->DATE_STATUS) $model->DATE_STATUS=time();
-						if ($model->update()){					
-							if ($count==0) $firstAnswermodel=$answer;
-							$count++;
-							$links[]=CHtml::link($model->ADDRESS,Array('view','id'=>$model->ID));						
-							if (!$holes) $this->redirect(array('view','id'=>$model->ID));						
-							}
-						}					
-					
-				}
-				else {
-					if (!$answer->isNewRecord) $answer->results=CHtml::listData($answer->results,'id','id');
-				}
+			if(isset($_POST['HoleAnswers'])){					
+				$answer->attributes=$_POST['HoleAnswers'];
+            $answer->date = strtotime($_POST['answerdate']);
+   		//	if ($model->date < $model->request_gibdd->DATE_STATUS))
+          //     $model->addError("DATE_CREATED",Yii::t('template', 'DATE_CANT_BE_PAST', array('{attribute}'=>$model->getAttributeLabel('DATE_CREATED')))); 
+
+
+            //if (isset($_POST['HoleAnswers']['results'])) $answer->results=$_POST['HoleAnswers']['results'];
+				$answer->request_id=$model->request_gibdd->id;
+				            
+				if ($firstAnswermodel) 
+               $answer->firstAnswermodel=$firstAnswermodel;
+               
+            $tran = $answer->dbConnection->beginTransaction();
+				if($answer->save()){
+					if ($model->STATE==Holes::STATE_INPROGRESS || $model->STATE==Holes::STATE_ACHTUNG)
+						$model->STATE=Holes::STATE_GIBDDRE;
+					$model->GIBDD_REPLY_RECEIVED=1;
+					if (!$model->DATE_STATUS) $model->DATE_STATUS=time();
+					if ($model->update()){					
+						if ($count==0) 
+                     $firstAnswermodel=$answer;
+						$count++;
+						$links[]=CHtml::link($model->ADDRESS,Array('view','id'=>$model->ID));
+                  $tran->commit();						
+						if (!$holes) 
+                     $this->redirect(array('view','id'=>$model->ID));						
+					}
+				}					
+				
+			}
+			else {
+				if (!$answer->isNewRecord) 
+               $answer->results=CHtml::listData($answer->results,'id','id');
+			}
 		}
 		
 		if ($holes && $count) {
-					if($count) Yii::app()->user->setFlash('user', 'Успешная загрузка ответа ГИБДД на ямы: <br/>'.implode('<br/>',$links).'<br/><br/><br/>');
-					else Yii::app()->user->setFlash('user', 'Произошла ошибка! Ни одного ответа не загружено');
-					$this->redirect(array('personal')); 
+         if($count) 
+            Yii::app()->user->setFlash('user', 'Успешная загрузка ответа ГАИ на ямы: <br/>'.implode('<br/>',$links).'<br/><br/><br/>');
+         else 
+            Yii::app()->user->setFlash('user', 'Произошла ошибка! Ни одного ответа не загружено');
+         $this->redirect(array('personal')); 
 		}	
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 		$cs=Yii::app()->getClientScript();
-        $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
-        $cs->registerScriptFile('http://api-maps.yandex.ru/1.1/index.xml?key='.$this->mapkey);
+      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
+      $cs->registerScriptFile('http://api-maps.yandex.ru/1.1/index.xml?key='.$this->mapkey);
 		
 		$this->render('gibddreply',array(
 			'models'=>$models,
@@ -301,31 +336,45 @@ class HolesController extends Controller
 		$this->layout='//layouts/header_user';
 		
 		$model=$this->loadModel($id);
+		$fixmodel=new HoleFixeds;
+		$fixmodel->user_id = Yii::app()->user->id;
+		$fixmodel->hole_id = $model->ID;
+		$fixmodel->date_fix = time();
+  
+
 		if (!$model->isUserHole && Yii::app()->user->level < 50){
-			if ($model->STATE=='fixed' || !$model->request_gibdd || !$model->request_gibdd->answers || $model->user_fix)
+			if ($model->STATE==Holes::STATE_FIXED || !$model->request_gibdd || !$model->request_gibdd->answers || $model->user_fix)
 				throw new CHttpException(403,'Доступ запрещен.');
 		}		
-		elseif ($model->STATE=='fixed' && $model->user_fix)
+		elseif ($model->STATE==Holes::STATE_FIXED && $model->user_fix)
 				throw new CHttpException(403,'Доступ запрещен.');		
 			
 		$model->scenario='fix';
 		
 		$cs=Yii::app()->getClientScript();
-        $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
-        $cs->registerScriptFile('http://api-maps.yandex.ru/1.1/index.xml?key='.$this->mapkey);
+      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
+      $cs->registerScriptFile('http://api-maps.yandex.ru/1.1/index.xml?key='.$this->mapkey);
 
 		if(isset($_POST['Holes']))
 		{
-			$model->STATE='fixed';
+			$model->STATE=Holes::STATE_FIXED;
 			$model->COMMENT2=$_POST['Holes']['COMMENT2'];
+         $fixmodel->comment = $model->COMMENT2; 
 			$model->DATE_STATUS=time();
-				if ($model->save() && $model->savePictures()){					
-					$this->redirect(array('view','id'=>$model->ID));
-					}
+         $fixmodel->date_fix = strtotime($_POST['fixdate']);   
+         
+         $tran = $model->dbConnection->beginTransaction();
+         
+         
+			if ($model->save() && $model->savePictures() && $fixmodel->save()){		
+            $tran->commit();
+				$this->redirect(array('view','id'=>$model->ID));
+			}
 		}
 
 		$this->render('fix_form',array(
 			'model'=>$model,	
+         'fixmodel'=>$fixmodel,
 			'newimage'=>new PictureFiles
 		));
 	}	
@@ -520,17 +569,16 @@ class HolesController extends Controller
 	{
 		$this->layout='//layouts/header_default';
 		
-		//Если нет таблиц в базе редиректим на контроллер миграции
-		if(Holes::model()->getDbConnection()->getSchema()->getTable(Holes::model()->tableName())===null)
-			$this->redirect(array('migration/index'));
-	
 		$model=new Holes('search');		
 		
 		$model->unsetAttributes();  // clear any default values
 		$model->PREMODERATED=1;
 		if(isset($_POST['Holes']) || isset($_GET['Holes']))
-			$model->attributes=isset($_POST['Holes']) ? $_POST['Holes'] : $_GET['Holes'];
-			if ($model->ADR_CITY=="Город") $model->ADR_CITY='';
+			$model->attributes= Yii::app()->request->getParam('Holes');//isset($_POST['Holes']) ? $_POST['Holes'] : $_GET['Holes'];
+
+		//if ($model->ADR_CITY=="Город") 
+      //   $model->ADR_CITY='';
+
 		$dataProvider=$model->search();
 
 		$this->render('index',array(
@@ -639,7 +687,7 @@ class HolesController extends Controller
 			if (!$file)
 				throw new CHttpException(404,'The requested page does not exist.');
 				
-			if ($file->answer->request->user_id!=Yii::app()->user->id && !Yii::app()->user->isModer && $file->answer->request->hole->STATE !='gibddre')
+			if ($file->answer->request->user_id!=Yii::app()->user->id && !Yii::app()->user->isModer && $file->answer->request->hole->STATE !=Holes::STATE_GIBDDRE)
 				throw new CHttpException(403,'Доступ запрещен.');
 				
 			$file->delete();			
@@ -660,15 +708,15 @@ class HolesController extends Controller
 		if(isset($_POST['Holes']) || isset($_GET['Holes']))
 			$model->attributes=isset($_POST['Holes']) ? $_POST['Holes'] : $_GET['Holes'];
 		
-		$cs=Yii::app()->getClientScript();
-        $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/holes_list.css');        
-        $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/hole_view.css');
-        $cs->registerScriptFile(CHtml::asset($this->viewPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'holes_selector.js'));
-		$cs->registerScriptFile('http://www.vertstudios.com/vertlib.min.js');        
-        $cs->registerScriptFile(CHtml::asset($this->viewPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'StickyScroller'.DIRECTORY_SEPARATOR.'StickyScroller.min.js'));
+      $cs=Yii::app()->getClientScript();
+      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/holes_list.css');        
+      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/hole_view.css');
+      $cs->registerScriptFile(CHtml::asset($this->viewPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'holes_selector.js'));
+      $cs->registerScriptFile('http://www.vertstudios.com/vertlib.min.js');        
+      $cs->registerScriptFile(CHtml::asset($this->viewPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'StickyScroller'.DIRECTORY_SEPARATOR.'StickyScroller.min.js'));
 		$cs->registerScriptFile(CHtml::asset($this->viewPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'StickyScroller'.DIRECTORY_SEPARATOR.'GetSet.js'));
-		$holes=Array();
-		$all_holes_count=0;		
+		//$holes=Array();
+		//$all_holes_count=0;		
 			
 		$this->render('personal',array(
 			'model'=>$model,
@@ -743,7 +791,7 @@ class HolesController extends Controller
 	
 	public function actionMap()
 	{
-		//$this->layout='//layouts/header_default';
+		$this->layout='//layouts/header_blank';
 	
 		$model=new Holes('search');
 		$model->unsetAttributes();  // clear any default values

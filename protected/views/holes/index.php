@@ -1,7 +1,6 @@
-<?
-$this->pageTitle=Yii::app()->name;
-?>
 <?php
+$this->pageTitle=Yii::app()->name;
+
 if(Yii::app()->user->isModer)
 	Yii::app()->clientScript->registerScript('modering',<<<EOD
     
@@ -125,15 +124,15 @@ EOD
 	?>
 	
 <div id="delform">
-		<div align="right"><span onclick="$('#delform').fadeOut()">&times;</span></div>
-		<?php $form=$this->beginWidget('CActiveForm', array(
-		'action'=>Yii::app()->createUrl("holes/delete"),		
-		)); ?>
-			<input type="hidden" name="id" id="del_id_input">
-			<input type="hidden" name="returnUrl" value="/" />
-			<input type="checkbox" name="banuser" value="1" id="banuser_input"> <label for="banuser_input">Забанить автора?</label><br>
-			<input type="submit" value="Удалить">
-		<?php $this->endWidget(); ?>
+	<div align="right"><span onclick="$('#delform').fadeOut()">&times;</span></div>
+	<?php $form=$this->beginWidget('CActiveForm', array(
+	'action'=>Yii::app()->createUrl("holes/delete"),		
+	)); ?>
+		<input type="hidden" name="id" id="del_id_input">
+		<input type="hidden" name="returnUrl" value="/" />
+		<input type="checkbox" name="banuser" value="1" id="banuser_input"> <label for="banuser_input">Забанить автора?</label><br>
+		<input type="submit" value="Удалить">
+	<?php $this->endWidget(); ?>
 </div>
 
 <div class="lCol">
@@ -189,7 +188,7 @@ EOD
 			<div id="filter_rf_subject_tip" class="filter_roller"></div>
 			<p class="short">
 				<label><?php echo Yii::t("holes", "WIDGET_TYPE_DEFECT"); ?></label>
-			<?php echo $form->dropDownList($model, 'TYPE_ID', CHtml::listData( HoleTypes::model()->findAll(Array('condition'=>'published=1', 'order'=>'ordering')), 'id','name'), array('prompt'=>Yii::t("holes", "WIDGET_TYPE_DEFECT"))); ?>
+			<?php echo $form->dropDownList($model, 'TYPE_ID', HoleTypes::getList(), array('prompt'=>Yii::t("holes", "WIDGET_TYPE_DEFECT"))); ?>
 			</p>
 			<p class="long">
 				<label class="fc"><?php echo Yii::t('holes', "WIDGET_DEFAULT_CITY");?></label>

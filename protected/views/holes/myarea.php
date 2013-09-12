@@ -1,5 +1,5 @@
 <?
-$this->pageTitle=Yii::app()->name . ' :: Мой участок';
+$this->pageTitle=Yii::app()->name.' :: '.Yii::t('template', 'MY_PLACE');
 ?>
 
 <?php Yii::app()->clientScript->registerScript('select_holes','			

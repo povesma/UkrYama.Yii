@@ -53,7 +53,7 @@ class UserGroupsModule extends CWebModule
 			'userGroups.components.*',
 		));
 		// register the css and js files
-		Yii::app()->clientScript->registerCoreScript('jquery');
+
 		// load css and js if the page wasn't loaded with ajax
 		if (!Yii::app()->request->isAjaxRequest) {
 			Yii::app()->clientScript->registerCssFile(Yii::app()->assetManager->publish(Yii::getPathOfAlias('userGroups') . '/css').'/userGroups.css');

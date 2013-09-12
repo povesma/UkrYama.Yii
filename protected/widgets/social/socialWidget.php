@@ -19,8 +19,8 @@ class socialWidget extends CWidget {
 
 
         protected function registerCoreScripts() {
-            $cs=Yii::app()->getClientScript();
-            $cs->registerCoreScript('jquery');
+            //$cs=Yii::app()->getClientScript();
+            //$cs->registerCoreScript('jquery');
         }
 
 

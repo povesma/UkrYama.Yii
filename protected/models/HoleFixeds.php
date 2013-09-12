@@ -37,8 +37,15 @@ class HoleFixeds extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('hole_id, user_id, date_fix', 'required'),
-			array('hole_id, user_id, date_fix', 'numerical', 'integerOnly'=>true),
+			array('hole_id, user_id, date_fix, createdate', 'numerical', 'integerOnly'=>true),
 			array('comment', 'length'),
+         
+         array('date_fix', 'compare', 'compareValue'=>time(), 'operator'=>'<', 'allowEmpty'=>false , 
+            'message'=>Yii::t('template', 'DATE_CANT_BE_FUTURE'),
+         ),
+         array('date_fix', 'compare', 'compareValue'=>time() - (7 * 86400), 'operator'=>'>', 'allowEmpty'=>false , 
+            'message'=>Yii::t('template', 'DATE_CANT_BE_PAST'),
+         ),           
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('hole_id, user_id, date_fix, comment', 'safe', 'on'=>'search'),
@@ -53,6 +60,8 @@ class HoleFixeds extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+         'user'=>array(self::BELONGS_TO, 'UserGroupsUser', 'user_id'),		
+         'hole'=>array(self::BELONGS_TO, 'Holes', 'hole_id'),		
 		);
 	}
 
@@ -62,12 +71,20 @@ class HoleFixeds extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'hole_id' => 'Hole',
-			'user_id' => 'User',
-			'date_fix' => 'Date Fix',
-			'comment' => 'Comment',
+			'hole_id' => Yii::t('template', 'HOLE'),
+			'user_id' => Yii::t('template', 'USER'),
+			'date_fix' => Yii::t('template', 'FIXDATE'),
+			'comment' => Yii::t('template', 'COMMENT'),
 		);
 	}
+   
+	public function beforeSave(){
+		parent::beforeSave();
+      if ($this->isNewRecord){
+         $this->createdate = time();   
+      }
+		return true;
+	}   		   
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.

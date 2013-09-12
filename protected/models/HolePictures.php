@@ -31,15 +31,15 @@ class HolePictures extends CActiveRecord
 	
 	public function getOriginal()
 	{
-		return '/upload/st1234/original/'.$this->hole_id.'/'.$this->filename;
+		return Yii::app()->params['imagePath'].'original/'.$this->hole_id.'/'.$this->filename;
 	}
 	public function getMedium()
 	{
-		return '/upload/st1234/medium/'.$this->hole_id.'/'.$this->filename;
+		return Yii::app()->params['imagePath'].'medium/'.$this->hole_id.'/'.$this->filename;
 	}
 	public function getSmall()
 	{
-		return '/upload/st1234/small/'.$this->hole_id.'/'.$this->filename;
+		return Yii::app()->params['imagePath'].'small/'.$this->hole_id.'/'.$this->filename;
 	}
 	
 	public function getLastOrder() 
@@ -108,7 +108,7 @@ class HolePictures extends CActiveRecord
 	}
 	
 	public function afterDelete(){
-		$pictdir=$_SERVER['DOCUMENT_ROOT'].'/upload/st1234/';
+		$pictdir=$_SERVER['DOCUMENT_ROOT'].Yii::app()->params['imagePath'];
 		if (!count ($this->findAll('hole_id='.$this->hole_id))){
 			//rmdir($pictdir.'original/'.$this->hole_id);
 			//rmdir($pictdir.'medium/'.$this->hole_id);

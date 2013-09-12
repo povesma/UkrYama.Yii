@@ -1,6 +1,8 @@
-<?
-$this->pageTitle=Yii::app()->name . ' :: Загрузка ответа ГИБДД';
+<?php
+$this->title = Yii::t('holes_view', 'HOLE_GIBDDREPLY');
+$this->pageTitle=Yii::app()->name . ' :: '.$this->title;
 ?>
+<h1><?php echo $this->title; ?></h1>
 <div class="form">
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'holes-form',
@@ -9,32 +11,32 @@ $this->pageTitle=Yii::app()->name . ' :: Загрузка ответа ГИБД�
 )); ?>
 <?php echo $form->errorSummary($answer); ?>
 
-	<? /*<input type="hidden" name="ID" value="<?= $F['ID']['VALUE'] ?>">
-	 if($F['FIX_ID']): ?>
-		<input type="hidden" name="FIX_ID" value="<?= $F['FIX_ID']['VALUE'] ?>">
-	<? elseif($F['GIBDD_REPLY_ID']): ?>
-		<input type="hidden" name="GIBDD_REPLY_ID" value="<?= $F['GIBDD_REPLY_ID']['VALUE'] ?>">
-	<? endif;*/ ?>
-
 	<!-- левая колоночка -->
-	<div class="lCol">
+	<div class="lCol main_section">
 		<!-- тип дефекта -->
 	<?php foreach ($models as $model) : ?>
 		<div class="f">
-			<?php echo $model->type->name; ?><br/>
-
-			<?php echo $model->ADDRESS; ?>	<br/>		
-
+			<p class="type <?php echo $model->type->alias ?>" style="padding-left: 30px;"><?php echo $model->type->getName()?></p>
+         <p class="address"><?= CHtml::encode($model->ADDRESS) ?></p>
 			<?php echo $model->COMMENT1; ?><br/>
 		</div>
 	<?php endforeach; ?>
 		
+		<!-- Дата обнаружения -->
+		<div class="f clearfix">
+		<?php echo $form->label($answer,'date'); ?>
+      <?php echo CHtml::textField('answerdate', date(C_DATEFORMAT, $answer->date)); ?>
+		<?php echo $form->error($answer,'date'); ?>
+		</div>
+      <script> $('#answerdate').datepicker({dateFormat: '<?php  echo C_DATEFORMAT_JS ?>'});</script>
+      
+
 		<!-- фотки -->
-		<div class="f">
-			<?php echo $form->labelEx($answer,'uppload_files'); ?>
+		<div class="f clearfix">
+			<?php echo $form->label($answer,'uppload_files'); ?>
 			<?php $this->widget('CMultiFileUpload',array('accept'=>'gif|jpg|png|pdf|txt', 'model'=>$answer, 'attribute'=>'uppload_files', 'htmlOptions'=>array('class'=>'mf'), 'denied'=>Yii::t('mf','Невозможно загрузить этот файл'),'duplicate'=>Yii::t('mf','Файл уже существует'),'remove'=>Yii::t('mf','удалить'),'selected'=>Yii::t('mf','Файлы: $file'),)); ?>						
 		</div>
-		
+            
 		<!-- анкета -->
 		<div class="f chekboxes">
 			<?php echo $form->labelEx($answer,'results'); ?>
@@ -42,11 +44,6 @@ $this->pageTitle=Yii::app()->name . ' :: Загрузка ответа ГИБД�
 			<?php echo $form->error($answer,'results'); ?>
 		</div>
 		
-	</div>
-	<!-- /левая колоночка -->
-	
-	<!-- правая колоночка -->
-	<div class="rCol"> 
 	<div class="f">		
 		<div class="bx-yandex-view-layout">
 			<div class="bx-yandex-view-map">
@@ -78,10 +75,10 @@ EOD
 	</div>		
 		
 		
-		<!-- камент -->
+		<!-- камент -->    
 		<div class="f">
 			<?php echo $form->labelEx($answer,'comment'); ?>
-			<?php echo $form->textArea($answer,'comment',array('rows'=>6, 'cols'=>50)); ?>
+			<?php echo $form->textArea($answer,'comment',array('rows'=>4, 'cols'=>30)); ?>
 			<?php echo $form->error($answer,'comment'); ?>
 		</div>
 
@@ -90,7 +87,7 @@ EOD
 	<div class="addSubmit">
 		<div class="container">
 			<div class="btn" onclick="$(this).parents('form').submit();">
-				<a class="addFact"><i class="text">Отправить</i><i class="arrow"></i></a>
+				<a class="addFact"><i class="text"><?php echo Yii::t('template', 'SEND')?></i><i class="arrow"></i></a>
 			</div>
 		</div>
 	</div>

@@ -1,5 +1,9 @@
 <?php
 
+defined('C_DATEFORMAT') or define('C_DATEFORMAT', 'd.m.Y');
+defined('C_DATEFORMAT_JS') or define('C_DATEFORMAT_JS', 'dd.mm.yy');
+defined('C_TIMEFORMAT') or define('C_TIMEFORMAT', 'h:m');
+
 setlocale(LC_TIME, array("ru_RU","rus_RUS"));
 
 // change the following paths if necessary

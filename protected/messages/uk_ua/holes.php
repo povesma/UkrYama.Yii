@@ -33,6 +33,12 @@ $MESS['HOLES_TYPE_HATCH']="Люк";
 $MESS['HOLES_TYPE_RAILS']="Рейки";
 $MESS['HOLES_TYPE_HOLEINYARD']="Яма у дворі";
 $MESS['HOLES_TYPE_SNOW']="Сніг";
+$MESS['HOLES_TYPE_CROSSING']="Переїзд";
+$MESS['HOLES_TYPE_POLICEMAN']="Лежачий поліцейський";
+$MESS['HOLES_TYPE_NOMARKING']="Відсутність розмітки";
+$MESS['HOLES_TYPE_FENCE']="Огорожа";
+$MESS['HOLES_TYPE_LIGHT']="Світлофор";
+$MESS['HOLES_TYPE_BADREPAIR']="Неякісний ремонт дороги";
 
 $MESS['all_news']="Всі новини";
 

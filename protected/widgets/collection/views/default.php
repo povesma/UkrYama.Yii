@@ -1,48 +1,44 @@
-<!-- <p class="collection">
-	Наша коллекция насчитывает<br /><strong><a href="/map/"><?php echo $all; ?></a> / <a href="/map/?STATE[2]=inprogress"><?php echo $ingibdd; ?>&nbsp; в гибдд</a> / <a href="/map/?STATE[3]=fixed"><?php echo $fixed; ?>&nbsp;исправлено</a></strong>
-</p> -->
-
 <div class="collection">
-	<span class="label">Наша колекція нараховує:</span>
+	<span class="label"><?php echo Yii::t('template', 'COUNT_IN_COLLECTION')?></span>
 	<div class="collection-counter-wrap">
 		<div class="collection-item">
 			<div class="wrap">
 				<span class="inside">
 					<?php 
-						for($i = 0; $i < strlen($all) ; $i++) {
-						    echo '<span>'. substr($all, $i, 1) .'</span>';
+						for($i = 0, $count = strlen($all) ; $i < $count; $i++) {
+                     echo CHtml::tag('span', array(), substr($all, $i, 1));						   
 						}
 					?>
 				</span>
 			</div>
-            <?php echo preg_replace('/[0-9 ]/ui', '', Y::declOfNum($all, array('дефект', 'дефекта', 'дефектов')))?>
+            <?php echo preg_replace('/[0-9 ]/ui', '', Y::declOfNum($all, Yii::t('template', 'COUNT_DEFECTS')))?>
 		</div>
 		<div class="collection-item">
 			<div class="wrap">
 				<span class="inside">
 					<?php 
-						for($i = 0; $i < strlen($ingibdd); $i++) {
-						    echo '<span>'. substr($ingibdd, $i, 1) .'</span>';
+						for($i = 0, $count = strlen($ingibdd) ; $i < $count; $i++) {
+						    echo CHtml::tag('span', array(), substr($ingibdd, $i, 1));
 						}
 					?>
 				</span>
 			</div>
-			в ДАЇ
+         <?php echo Yii::t('template', 'COUNT_GAI'); ?>			
 		</div>
 		<div class="collection-item">
 			<div class="wrap">
 				<span class="inside">
 					<?php 
-						for($i = 0; $i < strlen($fixed) 	; $i++) {
-						    echo '<span>'. substr($fixed, $i, 1) .'</span>';
+						for($i = 0, $count = strlen($fixed) ; $i < $count; $i++) {
+						    echo CHtml::tag('span', array(), substr($fixed, $i, 1));
 						}
 					?>
 				</span>
 			</div>
-			виправлено
+         <?php echo Yii::t('template', 'COUNT_COMMIT'); ?>				
 		</div>
 		<div class="collection-item how">
-			<a href="http://ukryama.com/page/donate/">Як покращити<br> ці показники?</a>
+         <?php echo CHtml::link(Yii::t('template', 'HOW_TO_SET_BETTER'), array('/page/donate')); ?>
 		</div>
 	</div>
 </div>

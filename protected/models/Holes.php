@@ -25,6 +25,12 @@
  */
 class Holes extends CActiveRecord
 {
+   const STATE_FRESH = 'fresh';
+   const STATE_INPROGRESS = 'inprogress';
+   const STATE_ACHTUNG = 'achtung';
+   const STATE_GIBDDRE = 'gibddre';
+   const STATE_FIXED = 'fixed';
+   const STATE_PROSECUTOR = 'prosecutor';
 	/**
 	 * Returns the static model of the specified AR class.
 	 * @return Holes the static model class
@@ -80,7 +86,7 @@ class Holes extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('USER_ID, LATITUDE, LONGITUDE, ADDRESS, DATE_CREATED, TYPE_ID, gibdd_id', 'required'),
-			array('GIBDD_REPLY_RECEIVED, PREMODERATED, TYPE_ID, NOT_PREMODERATED', 'numerical', 'integerOnly'=>true),
+			array('GIBDD_REPLY_RECEIVED, PREMODERATED, TYPE_ID, NOT_PREMODERATED, createdate, updatedate', 'numerical', 'integerOnly'=>true),
 			array('LATITUDE, LONGITUDE', 'numerical'),
 			array('USER_ID, STATE, DATE_CREATED, DATE_SENT, DATE_STATUS, ADR_SUBJECTRF, DATE_SENT_PROSECUTOR', 'length', 'max'=>10),
 			array('ADR_CITY', 'length', 'max'=>50),
@@ -88,6 +94,15 @@ class Holes extends CActiveRecord
 			array('COMMENT1, COMMENT2, COMMENT_GIBDD_REPLY, deletepict, upploadedPictures, request_gibdd, showUserHoles', 'safe'),	
 			array('upploadedPictures', 'file', 'types'=>'jpg, jpeg, png, gif','maxFiles'=>10, 'allowEmpty'=>true, 'on' => 'update, import, fix'),
 			array('upploadedPictures', 'file', 'types'=>'jpg, jpeg, png, gif','maxFiles'=>10, 'allowEmpty'=>false, 'on' => 'insert'),
+         
+         array('DATE_CREATED', 'compare', 'compareValue'=>time(), 'operator'=>'<=', 'allowEmpty'=>false , 
+            'message'=>Yii::t('template', 'DATE_CANT_BE_FUTURE'),
+         ),
+         /*array('DATE_CREATED', 'compare', 'compareValue'=>time() - (7 * 86400), 'operator'=>'>', 'allowEmpty'=>false , 
+            'message'=>Yii::t('template', 'DATE_CANT_BE_PAST'),
+         ),*/
+
+         
 			//array('upploadedPictures', 'required', 'on' => 'insert', 'message' => 'Необходимо загрузить фотографии'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
@@ -122,48 +137,47 @@ class Holes extends CActiveRecord
                '{{user_selected_lists_holes_xref}}(hole_id,list_id)'),
             'comments_cnt'=> array(self::STAT, 'Comment', 'owner_id', 'condition'=>'owner_name="Holes" AND status < 2'),   
             'comments'=> array(self::HAS_MANY, 'Comment', 'owner_id', 'condition'=>'owner_name="Holes"'), 
+         
 		);
 	}
-	
-	public function behaviors(){
-          return array( 'CAdvancedArBehavior' => array(
-            'class' => 'application.extensions.CAdvancedArBehavior'));
-    }
 
-	public static function getAllstates()	
-	{
-	$arr=Array();
-	$arr['fresh']      = Yii::t('holes','HOLES_STATE_FRESH_FULL');
-	$arr['inprogress'] = Yii::t('holes','HOLES_STATE_INPROGRESS_FULL');
-	$arr['fixed']      = Yii::t('holes','HOLES_STATE_FIXED_FULL');
-	$arr['achtung']    = Yii::t('holes','HOLES_STATE_ACHTUNG_FULL');
-	$arr['gibddre']    = Yii::t('holes','HOLES_STATE_GIBDDRE_FULL');
-	$arr['prosecutor'] = Yii::t('holes','HOLES_STATE_PROSECUTOR_FULL');
-	return $arr;
+      
+	public function behaviors(){
+      return array( 'CAdvancedArBehavior' => array(
+         'class' => 'application.extensions.CAdvancedArBehavior'));
+   }
+
+	public static function getAllstates()	{
+   	$arr=Array();
+   	$arr['fresh']      = Yii::t('holes','HOLES_STATE_FRESH_FULL');
+   	$arr['inprogress'] = Yii::t('holes','HOLES_STATE_INPROGRESS_FULL');
+   	$arr['fixed']      = Yii::t('holes','HOLES_STATE_FIXED_FULL');
+   	$arr['achtung']    = Yii::t('holes','HOLES_STATE_ACHTUNG_FULL');
+   	$arr['gibddre']    = Yii::t('holes','HOLES_STATE_GIBDDRE_FULL');
+   	$arr['prosecutor'] = Yii::t('holes','HOLES_STATE_PROSECUTOR_FULL');
+   	return $arr;
 	}
 	
-	public static function getAllstatesShort()	
-	{
-	$arr=Array();
-	$arr['fresh']      = Yii::t('holes','HOLES_STATE_FRESH_SHORT');
-	$arr['inprogress'] = Yii::t('holes','HOLES_STATE_INPROGRESS_SHORT');
-	$arr['fixed']      = Yii::t('holes','HOLES_STATE_FIXED_SHORT');
-	$arr['achtung']    = Yii::t('holes','HOLES_STATE_ACHTUNG_SHORT');
-	$arr['gibddre']    = Yii::t('holes','HOLES_STATE_GIBDDRE_SHORT');
-	$arr['prosecutor'] = Yii::t('holes','HOLES_STATE_PROSECUTOR_SHORT');
-	return $arr;
+	public static function getAllstatesShort()	{
+   	$arr=Array();
+   	$arr['fresh']      = Yii::t('holes','HOLES_STATE_FRESH_SHORT');
+   	$arr['inprogress'] = Yii::t('holes','HOLES_STATE_INPROGRESS_SHORT');
+   	$arr['fixed']      = Yii::t('holes','HOLES_STATE_FIXED_SHORT');
+   	$arr['achtung']    = Yii::t('holes','HOLES_STATE_ACHTUNG_SHORT');
+   	$arr['gibddre']    = Yii::t('holes','HOLES_STATE_GIBDDRE_SHORT');
+   	$arr['prosecutor'] = Yii::t('holes','HOLES_STATE_PROSECUTOR_SHORT');
+   	return $arr;
 	}	
 	
-	public static function getAllstatesMany()	
-	{
-	$arr=Array();
-	$arr['fresh']      = Yii::t('holes','HOLES_STATE_FRESH_MANY');
-	$arr['inprogress'] = Yii::t('holes','HOLES_STATE_INPROGRESS_MANY');
-	$arr['fixed']      = Yii::t('holes','HOLES_STATE_FIXED_MANY');
-	$arr['achtung']    = Yii::t('holes','HOLES_STATE_ACHTUNG_MANY');
-	$arr['gibddre']    = Yii::t('holes','HOLES_STATE_GIBDDRE_MANY');
-	$arr['prosecutor'] = Yii::t('holes','HOLES_STATE_PROSECUTOR_MANY');
-	return $arr;
+	public static function getAllstatesMany()	{
+   	$arr=Array();
+   	$arr['fresh']      = Yii::t('holes','HOLES_STATE_FRESH_MANY');
+   	$arr['inprogress'] = Yii::t('holes','HOLES_STATE_INPROGRESS_MANY');
+   	$arr['fixed']      = Yii::t('holes','HOLES_STATE_FIXED_MANY');
+   	$arr['achtung']    = Yii::t('holes','HOLES_STATE_ACHTUNG_MANY');
+   	$arr['gibddre']    = Yii::t('holes','HOLES_STATE_GIBDDRE_MANY');
+   	$arr['prosecutor'] = Yii::t('holes','HOLES_STATE_PROSECUTOR_MANY');
+	  return $arr;
 	}	
 	
 	public function getStateName()	
@@ -229,23 +243,24 @@ class Holes extends CActiveRecord
 
 		$imagess=$this->UpploadedPictures;
 		$id=$this->ID;
-		$prefix='';						
-		if (!is_dir($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/original/'.$id)){
-			if(!mkdir($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/original/'.$id))
+		$prefix='';			
+      $path = $_SERVER['DOCUMENT_ROOT'].Yii::app()->params['imagePath'];			
+		if (!is_dir($path.'original/'.$id)){
+			if(!mkdir($path.'original/'.$id))
 			{
 				$this->addError('upploadedPictures', Yii::t('errors', 'GREENSIGHT_ERROR_CANNOT_CREATE_DIR'));
 				return false;
 			}
-			if(!mkdir($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/medium/'.$id))
+			if(!mkdir($path.'medium/'.$id))
 			{
-				unlink($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/original/'.$id);
+				unlink($path.'original/'.$id);
 				$this->addError('upploadedPictures',Yii::t('errors', 'GREENSIGHT_ERROR_CANNOT_CREATE_DIR'));
 				return false;
 			}
-			if(!mkdir($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/small/'.$id))
+			if(!mkdir($path.'small/'.$id))
 			{
-				unlink($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/original/'.$id);
-				unlink($_SERVER['DOCUMENT_ROOT'].'/upload/st1234/medium/'.$id);
+				unlink($path.'original/'.$id);
+				unlink($path.'medium/'.$id);
 				$this->addError('upploadedPictures',Yii::t('errors', 'GREENSIGHT_ERROR_CANNOT_CREATE_DIR'));
 				return false;
 			}
@@ -254,7 +269,6 @@ class Holes extends CActiveRecord
 		$_params=$this->params;
 		$file_counter = 0;
 		$k = $this->ID;			
-		$pictdir=$_SERVER['DOCUMENT_ROOT'].'/upload/st1234/';
 						
         foreach ($imagess as $_file){
 			if(!$_file->hasError)
@@ -273,11 +287,11 @@ class Holes extends CActiveRecord
 					$new_y    = floor($_image_info[1] / $aspect);
 					$newimage = imagecreatetruecolor($new_x, $new_y);
 					imagecopyresampled($newimage, $image, 0, 0, 0, 0, $new_x, $new_y, $_image_info[0], $_image_info[1]);
-					imagejpeg($newimage, $_SERVER['DOCUMENT_ROOT'].'/upload/st1234/original/'.$id.'/'.$imgname);
+					imagejpeg($newimage, $path.'original/'.$id.'/'.$imgname);
 				}
 				else
 				{
-					imagejpeg($image, $_SERVER['DOCUMENT_ROOT'].'/upload/st1234/original/'.$id.'/'.$imgname);
+					imagejpeg($image, $path.'original/'.$id.'/'.$imgname);
 				}
 	
 				$aspect   = max($_image_info[0] / $_params['medium_sizex'], $_image_info[1] / $_params['medium_sizey']);
@@ -285,7 +299,7 @@ class Holes extends CActiveRecord
 				$new_y    = floor($_image_info[1] / $aspect);
 				$newimage = imagecreatetruecolor($new_x, $new_y);
 				imagecopyresampled($newimage, $image, 0, 0, 0, 0, $new_x, $new_y, $_image_info[0], $_image_info[1]);
-				imagejpeg($newimage, $_SERVER['DOCUMENT_ROOT'].'/upload/st1234/medium/'.$id.'/'.$imgname);
+				imagejpeg($newimage, $path.'medium/'.$id.'/'.$imgname);
 				imagedestroy($newimage);
 				$aspect   = min($_image_info[0] / $_params['small_sizex'], $_image_info[1] / $_params['small_sizey']);
 				$newimage = imagecreatetruecolor($_params['small_sizex'], $_params['small_sizey']);
@@ -302,7 +316,7 @@ class Holes extends CActiveRecord
 					ceil($aspect * $_params['small_sizex']),
 					ceil($aspect * $_params['small_sizey'])
 				);
-				imagejpeg($newimage, $_SERVER['DOCUMENT_ROOT'].'/upload/st1234/small/'.$id.'/'.$imgname);
+				imagejpeg($newimage, $path.'small/'.$id.'/'.$imgname);
 				imagedestroy($newimage);
 				imagedestroy($image);
 							
@@ -400,7 +414,7 @@ class Holes extends CActiveRecord
 	
 	public function updateSetinprogress()
 	{
-		if($this->STATE != 'fresh' && !($this->STATE == 'fixed' && !sizeof($this->user_pictures_fixed)))
+		if($this->STATE != Holes::STATE_FRESH && !($this->STATE == Holes::STATE_FIXED && !sizeof($this->user_pictures_fixed)))
 				{
 					return false;
 				}
@@ -408,34 +422,34 @@ class Holes extends CActiveRecord
 			if ($this->user_fix) $this->user_fix->delete();			
 			if (count ($this->fixeds) == 0) {
 					$this->DATE_STATUS=time();
-					if($this->STATE == 'fresh')  
+					if($this->STATE == Holes::STATE_FRESH)  
 					{
 						if (!$this->DATE_SENT) {
 							$this->DATE_SENT = time(); 						
 						}
-						$this->STATE='inprogress';										
+						$this->STATE = Holes::STATE_INPROGRESS;										
 					}
 					else
 					{
 						if($this->DATE_SENT)
 						{
-							$this->STATE = 'inprogress';
+							$this->STATE = Holes::STATE_INPROGRESS;
 						}						
 						if($this->DATE_SENT < time() - 37 * 86400)
 						{
-							$this->STATE = 'achtung';
+							$this->STATE = Holes::STATE_ACHTUNG;
 						}
 						if($this->GIBDD_REPLY_RECEIVED)
 						{
-							$this->STATE = 'gibddre';
+							$this->STATE = Holes::STATE_GIBDDRE;
 						}
 						if($this->DATE_SENT_PROSECUTOR)
 						{
-							$this->STATE = 'prosecutor';
+							$this->STATE = Holes::STATE_PROSECUTOR;
 						}
 						if(!$this->DATE_SENT)
 						{
-							$this->STATE = 'fresh';
+							$this->STATE = Holes::STATE_FRESH;
 							if ($this->request_gibdd) $this->request_gibdd->delete();
 						}
 					}
@@ -448,41 +462,39 @@ class Holes extends CActiveRecord
 	
 	public function updateRevoke()
 	{
-			if(!$this->request_gibdd || $this->request_gibdd->answer)
-				{
-					return false;	
-				}
+		if(!$this->request_gibdd || $this->request_gibdd->answer)
+			{
+				return false;	
+			}
+			$this->DATE_STATUS = time();
+			$this->request_gibdd->delete();
+			if (!count(HoleRequests::model()->findAll('hole_id='.$this->ID.' AND type="gibdd"'))) {
+				$this->DATE_SENT = null;
 				$this->DATE_STATUS = time();
-				$this->request_gibdd->delete();
-				if (!count(HoleRequests::model()->findAll('hole_id='.$this->ID.' AND type="gibdd"'))) {
-					$this->DATE_SENT = null;
-					$this->DATE_STATUS = time();
-					$this->STATE = 'fresh';
-					}
-				else {
-					$this->DATE_SENT = $this->requests_gibdd[0]->date_sent;
-				}	
-			if ($this->update()) return true;
-			else return false;
+				$this->STATE = Holes::STATE_FRESH;
+				}
+			else {
+				$this->DATE_SENT = $this->requests_gibdd[0]->date_sent;
+			}	
+		if ($this->update()) return true;
+		else return false;
 	}		
 	
 	
 	public function afterFind(){
-	
-		//if (!$this->pictures || !$this->user) $this->delete();
 		//вычисляем количество дней с момента отправки
-		if(($this->STATE == 'inprogress' || $this->STATE == 'achtung') && $this->DATE_SENT && !$this->STATE != 'gibddre')
+		if(($this->STATE == Holes::STATE_INPROGRESS || $this->STATE == Holes::STATE_ACHTUNG) && $this->DATE_SENT && !$this->STATE != Holes::STATE_GIBDDRE)
 		{
 			$this->WAIT_DAYS = 31 - ceil((time() - $this->DATE_SENT) / 86400);	
 		}
 			
 		//отмечаем яму если просроченна
-		if ($this->WAIT_DAYS < 0 && $this->STATE == 'inprogress') {
-			$this->STATE = 'achtung';
+		if ($this->WAIT_DAYS < 0 && $this->STATE == Holes::STATE_INPROGRESS) {
+			$this->STATE = Holes::STATE_ACHTUNG;
 			$this->update();
 		}
-		elseif ($this->STATE == 'achtung' && $this->WAIT_DAYS > 0){
-			$this->STATE = 'inprogress';
+		elseif ($this->STATE == Holes::STATE_ACHTUNG && $this->WAIT_DAYS > 0){
+			$this->STATE = Holes::STATE_INPROGRESS;
 			$this->update();			
 		}
 		
@@ -492,39 +504,42 @@ class Holes extends CActiveRecord
 		}		
 	}
 	
-	public function BeforeDelete(){
-				//сначала удаляем все картинки
-				foreach ($this->pictures as $picture) $picture->delete();			
-				
-				//Потом удаляем все запросы вместе со всем содержимым
-				foreach ($this->requests as $request) $request->delete();
-				
-				//Потом все отметки об исправленности
-				foreach ($this->fixeds as $fixed) $fixed->delete();
-				
-				$this->selected_lists=Array();
-				$this->update();
-	
-				return true;
+	public function beforeDelete(){
+		//сначала удаляем все картинки
+		foreach ($this->pictures as $picture) $picture->delete();			
+		
+		//Потом удаляем все запросы вместе со всем содержимым
+		foreach ($this->requests as $request) $request->delete();
+		
+		//Потом все отметки об исправленности
+		foreach ($this->fixeds as $fixed) $fixed->delete();
+		
+		$this->selected_lists=Array();
+		$this->update();
+
+		return true;
 	}	
 	
-	public function BeforeSave(){
-				parent::beforeSave();
-				$this->ADR_CITY=trim($this->ADR_CITY);
-					if ($this->scenario=='fix'){
-						$fixmodel=new HoleFixeds;
-						$fixmodel->user_id=Yii::app()->user->id;
-						$fixmodel->hole_id=$this->ID;
-						$fixmodel->date_fix=time();
-						$fixmodel->comment=$this->COMMENT2;
-						$fixmodel->save();					
-					}
-				return true;
+	public function beforeSave(){
+      parent::beforeSave();
+   
+      if ($this->isNewRecord){
+         
+			//$this->USER_ID = Yii::app()->user->id;	
+			$this->createdate = time();  
+      }
+      $this->updatedate = time();  
+   
+      $this->ADR_CITY=trim($this->ADR_CITY);
+	
+   	return true;
 	}		
 	
 	public function getIsUserHole(){				
-				if ($this->USER_ID==Yii::app()->user->id) return true;
-				else return false;
+      if ($this->USER_ID==Yii::app()->user->id) 
+         return true;
+      else 
+         return false;
 	}	
 	
 	public function getmodering(){
@@ -542,31 +557,35 @@ class Holes extends CActiveRecord
 	{
 		return array(
 			'ID' => 'ID',
-			'USER_ID' => 'Пользователь',
-			'LATITUDE' => 'Latitude',
-			'LONGITUDE' => 'Longitude',
-			'ADDRESS' => 'Адрес дефекта',
-			'gibdd_id'=>'Отдел ГАИ',
-			'STATE' => 'Статус',
-			'DATE_CREATED' => 'Дата создания',
-			'DATE_SENT' => 'Дата отправки в ГАИ',
-			'DATE_STATUS' => 'Date Status',
-			'COMMENT1' => 'Комментарии',
-			'COMMENT2' => 'Комментарии',
-			'TYPE_ID' => 'Тип дефекта',
-			'ADR_SUBJECTRF' => 'Область',
-			'ADR_CITY' => 'Город',
-			'COMMENT_GIBDD_REPLY' => 'Comment Gibdd Reply',
-			'GIBDD_REPLY_RECEIVED' => 'Gibdd Reply Received',
-			'PREMODERATED' => 'Модер.',
-			'NOT_PREMODERATED' => 'только непроверенные',
-			'DATE_SENT_PROSECUTOR' => 'Date Sent Prosecutor',
-			'deletepict'=>'Удалить фотографию?',
-			'replуfiles'=>'Необходимо добавить отсканированный ответ из ГАИ',
-			'upploadedPictures'=>$this->scenario=='fix' ? 'Желательно добавить фотографии исправленного дефекта' : 'Нужно загрузить фотографии'
+			'USER_ID' => Yii::t('template', 'USER'),
+			'LATITUDE' => Yii::t('template', 'LATITUDE'),
+			'LONGITUDE' => Yii::t('template', 'LONGITUDE'),
+			'ADDRESS' => Yii::t('template', 'DEFECT_ADDRESS'),
+			'gibdd_id'=>Yii::t('template', 'DEPARTMENT'),
+			'STATE' => Yii::t('holes', 'WIDGET_STATUS_DEFECT'),
+			'createdate' => Yii::t('template', 'CREATEDATE'),
+			'updatedate' => Yii::t('template', 'UPDATEDATE'),
+			'DATE_CREATED' => Yii::t('template', 'DATE_CREATED'),
+			'DATE_SENT' => Yii::t('template', 'DATE_SENT_TO_GIBDD'),
+			'DATE_STATUS' => Yii::t('template', 'DATE_STATUS'),
+			'COMMENT1' => Yii::t('template', 'COMMENTS'),
+			'COMMENT2' => Yii::t('template', 'COMMENTS'),
+			'TYPE_ID' => Yii::t('holes', 'WIDGET_TYPE_DEFECT'),         
+			'ADR_SUBJECTRF' => Yii::t('holes', 'WIDGET_DEFAULT_REGION'),
+			'ADR_CITY' => Yii::t('holes', 'WIDGET_DEFAULT_CITY'),
+			'COMMENT_GIBDD_REPLY' => Yii::t('template', 'COMMENT_GIBDD_REPLY'),
+			'GIBDD_REPLY_RECEIVED' => Yii::t('template', 'GIBDD_REPLY_RECEIVED'),
+			'PREMODERATED' => Yii::t('template', 'PREMODERATED'),
+			'NOT_PREMODERATED' =>  Yii::t('template', 'NOT_PREMODERATED'),
+			'DATE_SENT_PROSECUTOR' => Yii::t('template', 'DATE_SENT_PROSECUTOR'),			 
+         
+         'deletepict'=> Yii::t('template', 'DELETEPICT'), 
+			'replуfiles'=> Yii::t('template', 'INFO_REPLYFILES'), 
+			'upploadedPictures'=>$this->scenario=='fix' ? Yii::t('template', 'INFO_UPLOADPICT_FIX') : Yii::t('template', 'INFO_UPLOADPICT'),
 		);
 	}
-
+   
+  
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
 	 * @return CActiveDataProvider the data provider that can return the models based on the search/filter conditions.
@@ -596,7 +615,7 @@ class Holes extends CActiveRecord
 			$criteria->addCondition('t.USER_ID!='.$userid);
 			$criteria->compare('requests.user_id',$userid,true);
 			$criteria->together=true;
-			}		
+		}		
 		$criteria->compare('t.STATE',$this->STATE,true);	
 		$criteria->compare('t.TYPE_ID',$this->TYPE_ID,false);
 		$criteria->compare('type.alias',$this->type_alias,true);	

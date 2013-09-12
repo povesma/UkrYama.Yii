@@ -1,3 +1,9 @@
+<?php
+$this->title = Yii::t('holes_view', 'SET_DEFECT_AS_FIXED');
+$this->pageTitle=Yii::app()->name . ' :: '.$this->title;
+?>
+<h1><?php echo $this->title; ?></h1>
+
 <div class="form">
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'holes-form',
@@ -5,41 +11,35 @@
 	'htmlOptions'=>Array ('enctype'=>'multipart/form-data'),
 )); ?>
 <?php echo $form->errorSummary($model); ?>
-
-	<? /*<input type="hidden" name="ID" value="<?= $F['ID']['VALUE'] ?>">
-	 if($F['FIX_ID']): ?>
-		<input type="hidden" name="FIX_ID" value="<?= $F['FIX_ID']['VALUE'] ?>">
-	<? elseif($F['GIBDD_REPLY_ID']): ?>
-		<input type="hidden" name="GIBDD_REPLY_ID" value="<?= $F['GIBDD_REPLY_ID']['VALUE'] ?>">
-	<? endif;*/ ?>
+<?php echo $form->errorSummary($fixmodel); ?>
 
 	<!-- левая колоночка -->
-	<div class="lCol">
+	<div class="lCol main_section">
 		<!-- тип дефекта -->
 		<div class="f">
-			<?php echo $model->type->name; ?>
+			<p class="type <?= $model->type->alias ?>" style="padding-left: 30px;"><?= $model->type->getName()?></p>
+         <p class="address"><?= CHtml::encode($model->ADDRESS) ?></p>
 		</div>
 		
-		<!-- адрес -->
-		<div class="f">
-			<?php echo $model->ADDRESS; ?>			
+		<!-- Дата исправления -->
+		<div class="f clearfix">
+		<?php echo $form->labelEx($fixmodel,'date_fix'); ?>
+      <?php echo CHtml::textField('fixdate', date(C_DATEFORMAT, $fixmodel->date_fix)); ?>
+		<?php echo $form->error($fixmodel,'date_fix'); ?>
 		</div>
-		
+      <script> $('#fixdate').datepicker({dateFormat: '<?php  echo C_DATEFORMAT_JS ?>'});</script>
+            
 		<!-- фотки -->
-		<div class="f">
+		<div class="f clearfix">
 			<?php echo $form->labelEx($model,'upploadedPictures'); ?>
 			<?php $this->widget('CMultiFileUpload',array('accept'=>'gif|jpg|png|pdf|txt', 'model'=>$model, 'attribute'=>'upploadedPictures', 'htmlOptions'=>array('class'=>'mf'), 'denied'=>Yii::t('mf','Невозможно загрузить этот файл'),'duplicate'=>Yii::t('mf','Файл уже существует'),'remove'=>Yii::t('mf','удалить'),'selected'=>Yii::t('mf','Файлы: $file'),)); ?>						
 		</div>
 		
 		<!-- камент -->
-		<div class="f">
+		<div class="f clearfix">
 			<?php echo $model->COMMENT1; ?>
 		</div>
-	</div>
-	<!-- /левая колоночка -->
-	
-	<!-- правая колоночка -->
-	<div class="rCol"> 
+
 	<div class="f">		
 		<div class="bx-yandex-view-layout wide">
 			<div class="bx-yandex-view-map">
@@ -71,7 +71,7 @@ EOD
 	<div class="addSubmit">
 		<div class="container">
 			<div class="btn" onclick="$(this).parents('form').submit();">
-				<a class="addFact"><i class="text">Отправить</i><i class="arrow"></i></a>
+				<a class="addFact"><i class="text"><?php echo Yii::t('template', 'SEND')?></i><i class="arrow"></i></a>
 			</div>
 		</div>
 	</div>

@@ -33,7 +33,7 @@ return array(
 		'ext.eoauth.lib.*',
 		'ext.lightopenid.*',
 		'ext.eauth.services.*',
-			),
+	),
 	'modules'=>array(
 		
 			'gii'=>array(
@@ -189,14 +189,10 @@ return array(
 			'routes'=>array(
                 array(
                     'class'=>'CFileLogRoute',
-                    'levels'=>'error, warning',
-                ),
-                array(
-                    'class' => 'application.extensions.pqp.PQPLogRoute',
-                    'categories' => 'application.*, exception.*',
+                    'levels'=>'error, warning, info',
                 ),
             ),
-			'enabled'=>isset($_GET['testing'])?true:false,  // enable caching in non-debug mode  
+		//	'enabled'=>isset($_GET['testing'])?true:false,  // enable caching in non-debug mode  
 		),
 	),
 
