@@ -15,8 +15,36 @@
       </div>
    </div>
    <?php endif; ?>
-                  
+<script>
+$(window).keydown(function(e){
+	if (e.keyCode==80 && e.ctrlKey){
+		var c=document.getElementById('pdf_form');
+		if(c){
+			c.style.display='block';
+			e.preventDefault();
+		}
+	}
+	if (e.keyCode==27){
+		var c=document.getElementById('pdf_form');
+		if(c){
+			c.style.display='none';
+			e.preventDefault();
+		}
+	}
 
+
+});
+function langChange(val,btn){
+	$(".lnbtn").removeClass("selbt")
+	btn.className="lnbtn selbt";
+	requestForm.HoleRequestForm_lang.value=val;
+	$.post("/holes/langChange/<?= $hole->ID ?>",{'lang':val},function(data){
+	var test = data.split("|");
+	requestForm.HoleRequestForm_to_address.value=test[0];
+	requestForm.HoleRequestForm_to_name.value=test[1]+" "+test[2];
+	});
+}
+</script>
 
    <?php if(!Yii::app()->user->isGuest){ 
       switch($hole->STATE){
@@ -25,7 +53,7 @@
 	         //endif; ?>
          	<div class="progress">
          		<div class="lc">
-         			<a href="#" onclick="var c=document.getElementById('pdf_form');if(c){c.style.display=c.style.display=='block'?'none':'block';}return false;" class="printDeclaration"><?= Yii::t('holes_view', 'PRINT_CLAIM') ?></a>
+         			<a href="#" onclick="var c=document.getElementById('pdf_form');if(c){c.style.display=c.style.display=='block'?'none':'block';c.focus()}return false;" class="printDeclaration"><?= Yii::t('holes_view', 'PRINT_CLAIM') ?></a>
          		</div>
          		<div class="cc">
          			<?php 
@@ -47,13 +75,13 @@
 						</div>
                <?php endif; ?>	
 						<div class="rc">
-							<p><a class="declarationBtn" href="#" onclick="var c=document.getElementById('pdf_form');if(c){c.style.display=c.style.display=='block'?'none':'block';}return false;"><?php Yii::t('holes_view', 'PRINT_CLAIM') ?></a></p>
+							<p><a class="declarationBtn" href="#" onclick="var c=document.getElementById('pdf_form');if(c){c.style.display=c.style.display=='block'?'none':'block';c.focus()}return false;"><?php Yii::t('holes_view', 'PRINT_CLAIM') ?></a></p>
 							<p><?php echo CHtml::link(Yii::t('holes_view', 'CANCEL_REQUEST_MY_CLAIM'), array('notsent', 'id'=>$hole->ID),array('class'=>"declarationBtn")); ?></p>
 							<p><?php echo CHtml::link(Yii::t('holes_view', 'HOLE_CART_ADMIN_GIBDD_REPLY_RECEIVED'), array('gibddreply', 'id'=>$hole->ID),array('class'=>"declarationBtn")); ?></p>
 						</div>
 					<?php else : ?>	
 						<div class="cc">
-							<p><a href="#" onclick="var c=document.getElementById('pdf_form');if(c){c.style.display=c.style.display=='block'?'none':'block';}return false;" class="declarationBtn"><?= Yii::t('holes_view', 'PRINT_CLAIM') ?></a></p>
+							<p><a href="#" onclick="var c=document.getElementById('pdf_form');if(c){c.style.display=c.style.display=='block'?'none':'block';c.focus();}return false;" class="declarationBtn"><?= Yii::t('holes_view', 'PRINT_CLAIM') ?></a></p>
 							<p><?php echo CHtml::link(Yii::t('holes_view', 'CLAIM_TO_GAI_WAS_SEND'), array('sent', 'id'=>$hole->ID),array('class'=>"declarationBtn")); ?></p>
 						</div>
                   <div class="splitter"></div>

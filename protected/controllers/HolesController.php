@@ -31,7 +31,7 @@ class HolesController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('add','update', 'personal','personalDelete','request','requestForm','sent','notsent','gibddreply', 'fix', 'defix', 'prosecutorsent', 'prosecutornotsent','delanswerfile','myarea', 'territorialGibdd', 'delpicture','selectHoles','sentMany','review'),
+				'actions'=>array('add','update', 'personal','personalDelete','request','langChange','requestForm','sent','notsent','gibddreply', 'fix', 'defix', 'prosecutorsent', 'prosecutornotsent','delanswerfile','myarea', 'territorialGibdd', 'delpicture','selectHoles','sentMany','review'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -192,7 +192,13 @@ class HolesController extends Controller
 			//думаю, 4 первых буквы хватает для однозначного определения области
 			$s=mb_substr(mb_strtolower(trim($model->STR_SUBJECTRF),'UTF-8'),0,4,'UTF-8');
 			$subj=RfSubjects::model()->find('LOWER(name_full) LIKE :name', array(':name'=>'%'.$s.'%'));
-			$data=GibddHeads::model()->findAll('subject_id=:id',array(':id'=>$subj->id));
+			if(Yii::app()->user->getLanguage()=="ru"){
+				$data=GibddHeads_ru::model()->findAll('subject_id=:id',array(':id'=>$subj->id));
+			}
+
+			if(Yii::app()->user->getLanguage()=="ua"){
+				$data=GibddHeads_ua::model()->findAll('subject_id=:id',array(':id'=>$subj->id));
+			}
 			//$data=CHtml::listData($model->search(),'id','gibdd_name');
 		    foreach($data as $value) { 
 				echo CHtml::tag('option',
@@ -462,7 +468,12 @@ class HolesController extends Controller
 	public function actionRequestForm($id, $type, $holes)
 	{
 		if ($id){
-			$gibdd=GibddHeads::model()->findByPk((int)$id);
+			if(Yii::app()->user->getLanguage()=="ru"){
+				$gibdd=GibddHeads_ru::model()->findByPk((int)$id);
+			}
+			if(Yii::app()->user->getLanguage()=="ua"){
+				$gibdd=GibddHeads_ua::model()->findByPk((int)$id);
+			}
 			$holemodel=Holes::model()->findAllByPk(explode(',',$holes));
 			if ($type=='gibdd') 
 				$this->renderPartial('_form_gibdd_manyholes',Array('holes'=>$holemodel, 'gibdd'=>$gibdd));
@@ -470,7 +481,18 @@ class HolesController extends Controller
 		//else echo "Выбирите отдел ГИБДД";
 	}	
 
-	//генерация запросов в ГИБДД
+	//генерация запросов в ГАИ
+	public function actionLangchange($id=null){
+		$lang=$_POST['lang'];
+		if($id){$model=$this->loadModel($id);};
+		$head=$model->gibdd->id;
+		if($lang=="ru"){$gibdd=GibddHeads_ru::model()->findByPk($head);}
+		else{$gibdd=GibddHeads_ua::model()->findByPk($head);}
+		echo $gibdd->address."|".$gibdd->post_dative."|".$gibdd->fio_dative;
+                //$model->to_name=$gibdd ? $gibdd->post_dative.' '.$gibdd->fio_dative: '';
+                //$model->to_address=$gibdd ? $gibdd->address : '';
+	}
+
 	public function actionRequest($id=null)
 	{			
 			if ($id) $model=$this->loadModel($id);				
@@ -480,85 +502,66 @@ class HolesController extends Controller
 			{
 				$request->attributes=$_POST['HoleRequestForm'];
 				$_images = array();
-				$date3 = $request->application_data   ? strtotime($request->application_data) : time();
-				if ($request->form_type == 'prosecutor')
-					$date3 = strtotime($request->application_data);
-					
-				$date2 = $request->form_type == 'prosecutor' && $model->request_gibdd ? $model->request_gibdd->date_sent  : time();
-				$_data = array
-				(
-					'chief'       => $request->to,
-					'fio'         => $request->from,
-					'address'     => $request->postaddress,
-					'date1.day'   => date('d', $model->DATE_CREATED ? $model->DATE_CREATED : time()),
-					'date1.month' => date('m', $model->DATE_CREATED ? $model->DATE_CREATED : time()),
-					'date1.year'  => date('Y', $model->DATE_CREATED ? $model->DATE_CREATED : time()),
-					'street'      => $request->address,
-					'date2.day'   => date('d', $date2),
-					'date2.month' => date('m', $date2),
-					'date2.year'  => date('Y', $date2),
-					'signature'   => $request->signature,
-					'reason'      => $request->comment,
-					'date3.day'   => date('d', $date3),
-					'date3.month' => date('m', $date3),
-					'date3.year'  => date('Y', $date3),
-					'gibdd'       => $request->gibdd,
-					'gibdd_reply' => $request->gibdd_reply
+				setlocale(LC_ALL, 'ru_RU.UTF-8');
+
+				$photos = "";
+				$pnum=1;
+				foreach($model->pictures_fresh as $picture)
+				{
+					$pfile=$picture->original;
+					$image=Yii::app()->image->load(Yii::getPathOfAlias('webroot').$pfile);
+
+//					$image->render();
+					if($image->__get("height")>$image->__get("width")){
+						$image->rotate(-90);
+						$fname=$pfile;
+
+						preg_match('/[^?]*/', $fname, $matches);
+					        $string = $matches[0];
+						$pattern = preg_split('/\./', $string, -1, PREG_SPLIT_OFFSET_CAPTURE);
+					        $filenamepart = $pattern[count($pattern)-1][0];
+						preg_match('/[^?]*/', $filenamepart, $matches);
+						$lastdot = $pattern[count($pattern)-1][1];
+						$filename = substr($string, 0, $lastdot-1);
+					        $pfile=$filename.".rotated.".$matches[0];
+						$image->save(Yii::getPathOfAlias('webroot').$pfile);
+					}
+					$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' №'.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' "S-50/'.$id.'"<br><img height="500px" src="'.$pfile.'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+				$pnum++;
+				}
+				$lang=Yii::app()->user->getLanguage();
+				if($request->lang=="ru"){
+					Yii::app()->setLanguage("ru");
+				}else{
+					Yii::app()->setLanguage("uk_ua");
+				}
+				$_data = array(
+					"ref" => "S-50/$id",
+					"to_name" => $request->to_name,
+					"to_address"=>$request->to_address,
+					"from_name"=>$request->from,
+					"from_address"=>$request->postaddress,
+					"when"=>strftime("%e ".Yii::t('month', date("n"))." %Y", $model->DATE_CREATED ? $model->DATE_CREATED : time()),
+					"where"=>$request->address,
+					"date"=>strftime("%e ".Yii::t('month', date("n"))." %Y", time()),
+					"init"=>$request->signature,
+					"c_photos"=>count($model->pictures_fresh),
+					"files"=>$photos
 				);
-			
+
 				if($request->html)
 				{
-					foreach($model->pictures_fresh as $picture)
-					{
-						$_images[] = $picture->original;
-					}
 					header('Content-Type: text/html; charset=utf8', true);
-					$HT = new html1234();
-					if (!$request->holes)
-						$HT->gethtml
-						(
-							$request->form_type ? $request->form_type : $model->type,
-							$_data,
-							$_images
-						);
-					else {
-						$HT->models=Holes::model()->findAllByPk($request->holes);
-							$HT->gethtml
-							(
-								'gibdd',
-								$_data,
-								Array(),
-								$request->printAllPictures
-							);
-						}
-				}
+					$printer = Yii::app()->Printer;
+					echo $printer->printHTML($_data, "form_gai", $request->lang);
+
+				}//end print html
 				else
-				{
-					header_remove('Content-Type');	
-					foreach($model->pictures_fresh as $picture)
-					{
-						$_images[] = $_SERVER['DOCUMENT_ROOT'].$picture->original;
-					}
-					header('Content-Type: application/pdf; charset=utf-8', true);
-					$PDF = new pdf1234();
-					if (!$request->holes)
-						$PDF->getpdf
-						(
-							$request->form_type ? $request->form_type : $model->type,
-							$_data,
-							$_images
-						);
-					else {
-						$PDF->models=Holes::model()->findAllByPk($request->holes);
-							$PDF->getpdf
-							(
-								'gibdd',
-								$_data,
-								Array(),
-								$request->printAllPictures
-							);
-						}
-				}
+				{//print pdf
+					$printer = Yii::app()->Printer;
+					$filename="ukryama-".date("Y-m-d_G-i-s");
+					echo $printer->printPDF($_data, "form_gai", $request->lang, $filename);
+				}//end print pdf
 			}		
 	}		
 
@@ -748,7 +751,13 @@ class HolesController extends Controller
 				foreach ($newsel as $key=>$val) unset($selected[$key]);
 			}
 			Yii::app()->user->setState('selectedHoles', $selected);
-			if ($selected) $gibdds=GibddHeads::model()->with('holes')->findAll('holes.id IN ('.implode(',',$selected).')');
+
+			if(Yii::app()->user->getLanguage()=="ru"){
+				if ($selected) $gibdds=GibddHeads_ru::model()->with('holes')->findAll('holes.id IN ('.implode(',',$selected).')');
+			}
+			if(Yii::app()->user->getLanguage()=="ua"){
+				if ($selected) $gibdds=GibddHeads_ua::model()->with('holes')->findAll('holes.id IN ('.implode(',',$selected).')');
+			}
 
 		}
 		$this->renderPartial('_selected', Array('gibdds'=>$gibdds,'user'=>Yii::app()->user->userModel));

@@ -3,7 +3,7 @@
 						'id'=>'request-form',
 						'enableAjaxValidation'=>false,
 						'action'=>Yii::app()->createUrl("holes/request", array("id"=>$hole->ID)),
-						'htmlOptions'=>Array ('onsubmit'=>"document.getElementById('pdf_form').style.display='none';"),
+						'htmlOptions'=>Array ('onsubmit'=>"document.getElementById('pdf_form').style.display='none';",'name'=>"requestForm"),
 					));
 					$usermodel=Yii::app()->user->userModel;
 					$model=new HoleRequestForm;
@@ -14,18 +14,35 @@
                         $model->postaddress=$usermodel->relProfile->request_address ? $usermodel->relProfile->request_address : '';
                     }
 
-                    $model->to=$gibdd ? $gibdd->post_dative.' '.$gibdd->fio_dative.' '.$gibdd->address : '';
+                    $model->to_name=$gibdd ? $gibdd->post_dative.' '.$gibdd->fio_dative: '';
+                    $model->to_address=$gibdd ? $gibdd->address : '';
                     $model->address=CHtml::encode($hole->ADDRESS);
+
 					?>
 						<h2><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM') ?></h2>
 						<table>
 							<tr>
-								<th><?php echo $form->labelEx($model,'to'); ?></th>
-								<td>
-                                    <?php echo $form->textArea($model,'to',array('rows'=>3, 'cols'=>40)); ?>
-                                    <span class="comment"><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM_TO_COMMENT') ?></span>
-                                </td>
+							<th><?= $form->labelEx($model,"lang")?></th>
+							<td colspan="2">
+							<?= CHtml::button("Українською", Array('class'=>'lnbtn selbt', 'name'=>'uaBtn', 'onClick'=>'langChange("ua",this)'))." ".CHtml::button("По-русски", Array('class'=>'lnbtn', 'name'=>'ruBtn', 'onClick'=>'langChange("ru",this)')) ?><?= $form->hiddenField($model, "lang", array("value"=>"ua")) ?>
+							</td>
+							<td rowspan=8><div class="notes"><?= Yii::t('holes_view', 'ST1234_INSTRUCTION') ?></div></td>
 							</tr>
+							<tr>
+								<th><?php echo $form->labelEx($model,'to_name'); ?></th>
+								<td>
+				                                	<?php echo $form->textField($model,'to_name',array('rows'=>3, 'cols'=>40)); ?>
+                                					<span class="comment"><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM_TO_NAME_COMMENT') ?></span>
+			                                	</td>
+							</tr>
+							<tr>
+								<th><?php echo $form->labelEx($model,'to_address'); ?></th>
+								<td>
+				                                	<?php echo $form->textArea($model,'to_address',array('rows'=>3, 'cols'=>40)); ?>
+                                					<span class="comment"><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM_TO_ADDRESS_COMMENT') ?></span>
+			                                	</td>
+							</tr>
+
 							<tr>
 								<th><?php echo $form->labelEx($model,'from'); ?></th>
 								<td>
@@ -71,4 +88,4 @@
 							</tr>
 						</table>
 					<?php $this->endWidget(); ?>
-					<div class="notes"><?= Yii::t('holes_view', 'ST1234_INSTRUCTION') ?></div>
+

@@ -8,7 +8,8 @@
 					)); 
 					$usermodel=Yii::app()->user->userModel;
 					$model=new HoleRequestForm;
-                                        $model->to=$gibdd ? $gibdd->post_dative.' '.$gibdd->fio_dative.' '.$gibdd->address : '';
+                                        $model->to_name=$gibdd ? $gibdd->post_dative.' '.$gibdd->fio_dative : '';
+                                        $model->to_address=$gibdd ? $gibdd->post_dative.' '.$gibdd->address : '';
 					$model->from=$usermodel->relProfile->request_from ? $usermodel->relProfile->request_from : $usermodel->last_name.' '.$usermodel->name.' '.$usermodel->second_name;
 					$model->signature=$usermodel->relProfile->request_signature ? $usermodel->relProfile->request_signature : $usermodel->last_name.' '.substr($usermodel->name, 0, 2).($usermodel->name ? '.' : '').' '.substr($usermodel->second_name, 0, 2).($usermodel->second_name ? '.' : '');
 					$model->postaddress=$usermodel->relProfile->request_address ? $usermodel->relProfile->request_address : '';
@@ -17,8 +18,12 @@
 						<table>
 							<?php foreach ($holes as $hole) echo $form->hiddenField($model,'holes[]',Array('value'=>$hole->ID)); ?>
 							<tr>
-								<th><?php echo $form->labelEx($model,'to'); ?><span class="comment"><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM_TO_COMMENT') ?></span></th>
-								<td><?php echo $form->textArea($model,'to',array('rows'=>3, 'cols'=>40)); ?></td>
+								<th><?php echo $form->labelEx($model,'to_name'); ?><span class="comment"><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM_TO_COMMENT') ?></span></th>
+								<td><?php echo $form->textArea($model,'to_name',array('rows'=>3, 'cols'=>40)); ?></td>
+							</tr>
+							<tr>
+								<th><?php echo $form->labelEx($model,'to_address'); ?><span class="comment"><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM_TO_COMMENT') ?></span></th>
+								<td><?php echo $form->textArea($model,'to_address',array('rows'=>3, 'cols'=>40)); ?></td>
 							</tr>
 							<tr>
 								<th><?php echo $form->labelEx($model,'from'); ?><span class="comment"><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM_FROM_COMMENT') ?></span></th>

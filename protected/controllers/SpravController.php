@@ -113,8 +113,13 @@ class SpravController extends Controller
 			}
 			
 			//ищем запись с главами гибдд
-			$model=GibddHeads::model()->find('subject_id=:s_id',array(':s_id'=>$region->id));
-			if (!$model) $model=new GibddHeads();
+			if(Yii::app()->user->getLanguage()=="ru"){
+				$model=GibddHeads_ru::model()->find('subject_id=:s_id',array(':s_id'=>$region->id));
+				if (!$model) $model=new GibddHeads_ru();
+			}elseif(Yii::app()->user->getLanguage()=="ua"){
+				$model=GibddHeads_ru::model()->find('subject_id=:s_id',array(':s_id'=>$region->id));
+				if (!$model) $model=new GibddHeads_ru();
+			}
 			$model->setAttributes(array(
 				'name'=>$g['region'],
 				'subject_id'=>$region->id,
@@ -230,7 +235,11 @@ class SpravController extends Controller
 	
 	public function actionAdd()
 	{
-		$model=new GibddHeads;
+		if(Yii::app()->user->getLanguage()=="ru"){
+			$model=new GibddHeads_ru;
+		}elseif(Yii::app()->user->getLanguage()=="ua"){
+			$model=new GibddHeads_ua;
+		}
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -333,7 +342,13 @@ class SpravController extends Controller
 	
 	public function loadGibddModel($id)
 	{
-		$model=GibddHeads::model()->findByPk($id);
+
+		if(Yii::app()->user->getLanguage()=="ru"){
+			$model=GibddHeads_ru::model()->findByPk($id);
+		}elseif(Yii::app()->user->getLanguage()=="ua"){
+			$model=GibddHeads_ua::model()->findByPk($id);
+		}
+
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;

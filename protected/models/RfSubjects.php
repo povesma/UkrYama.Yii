@@ -51,12 +51,23 @@ class RfSubjects extends CActiveRecord
 	{
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		return array(
-		'gibdd'=>array(self::HAS_ONE, 'GibddHeads', 'subject_id', 'condition'=>'is_regional=1'),//Yii::app()->user->isModer ? '':''
-		'gibdd_local'=>array(self::HAS_MANY, 'GibddHeads', 'subject_id', 'condition'=>Yii::app()->user->isModer ? 'is_regional=0': (!Yii::app()->user->isGuest ? 'is_regional=0 AND (moderated=1 OR author_id='.Yii::app()->user->id.')':'is_regional=0 AND moderated=1')),
-		'gibdd_local_not_moderated' => array(self::STAT, 'GibddHeads', 'subject_id', 'condition'=>'moderated=0'),
-		'prosecutor'=>array(self::HAS_ONE, 'Prosecutors', 'subject_id'),
+		if(Yii::app()->user->getLanguage()=="ru"){
+			return array(
+			'gibdd'=>array(self::HAS_ONE, 'GibddHeads_ru', 'subject_id', 'condition'=>'is_regional=1'),//Yii::app()->user->isModer ? '':''
+			'gibdd_local'=>array(self::HAS_MANY, 'GibddHeads_ru', 'subject_id', 'condition'=>Yii::app()->user->isModer ? 'is_regional=0': (!Yii::app()->user->isGuest ? 'is_regional=0 AND (moderated=1 OR author_id='.Yii::app()->user->id.')':'is_regional=0 AND moderated=1')),
+			'gibdd_local_not_moderated' => array(self::STAT, 'GibddHeads_ru', 'subject_id', 'condition'=>'moderated=0'),
+			'prosecutor'=>array(self::HAS_ONE, 'Prosecutors', 'subject_id'),
 		);
+
+		}elseif(Yii::app()->user->getLanguage()=="ua"){
+			return array(
+			'gibdd'=>array(self::HAS_ONE, 'GibddHeads_ua', 'subject_id', 'condition'=>'is_regional=1'),//Yii::app()->user->isModer ? '':''
+			'gibdd_local'=>array(self::HAS_MANY, 'GibddHeads_ua', 'subject_id', 'condition'=>Yii::app()->user->isModer ? 'is_regional=0': (!Yii::app()->user->isGuest ? 'is_regional=0 AND (moderated=1 OR author_id='.Yii::app()->user->id.')':'is_regional=0 AND moderated=1')),
+			'gibdd_local_not_moderated' => array(self::STAT, 'GibddHeads_ua', 'subject_id', 'condition'=>'moderated=0'),
+			'prosecutor'=>array(self::HAS_ONE, 'Prosecutors', 'subject_id'),
+		);
+
+		}
 	}
 
 	/**

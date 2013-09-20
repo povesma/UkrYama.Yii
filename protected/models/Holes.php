@@ -132,7 +132,8 @@ class Holes extends CActiveRecord
 			'user_fix'=>array(self::HAS_ONE, 'HoleFixeds', 'hole_id', 'condition'=>'user_fix.user_id='.Yii::app()->user->id),
 			'type'=>array(self::BELONGS_TO, 'HoleTypes', 'TYPE_ID'),
 			'user'=>array(self::BELONGS_TO, 'UserGroupsUser', 'USER_ID'),		
-			'gibdd'=>array(self::BELONGS_TO, 'GibddHeads', 'gibdd_id'),
+//			'gibdd'=>Yii::app()->user->getLanguage()=="ua"?array(self::BELONGS_TO, 'GibddHeads_ua', 'gibdd_id'):array(self::BELONGS_TO, 'GibddHeads_ru', 'gibdd_id'),
+			'gibdd'=>array(self::BELONGS_TO, 'GibddHeads_ua', 'gibdd_id'),
 			'selected_lists'=>array(self::MANY_MANY, 'UserSelectedLists',
                '{{user_selected_lists_holes_xref}}(hole_id,list_id)'),
             'comments_cnt'=> array(self::STAT, 'Comment', 'owner_id', 'condition'=>'owner_name="Holes" AND status < 2'),   
@@ -225,7 +226,13 @@ class Holes extends CActiveRecord
 		$criteria->order='ABS(distance) ASC';		
 		$criteria->having='ABS(distance) < 1000';
 		$criteria->limit=5;
-		$gibdds=GibddHeads::model()->findAll($criteria);
+
+		if(Yii::app()->user->getLanguage()=="ru"){
+			$gibdds=GibddHeads_ru::model()->findAll($criteria);
+		}elseif(Yii::app()->user->getLanguage()=="ua"){
+			$gibdds=GibddHeads_ua::model()->findAll($criteria);
+		}
+
 		if ($this->subject) array_unshift ($gibdds, $this->subject->gibdd);
 		return $gibdds;
 	}

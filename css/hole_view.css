@@ -206,10 +206,11 @@ div.rCol .after .comment {
 	border-radius: 20px;
 	-moz-border-radius: 20px;
 	-webkit-border-radius: 20px;
-	left: -10px;
-	padding: 20px 70px;
-	position: absolute;
-	width: 660px;
+	margin-left: -200px;
+	padding: 20px 20px;
+	position: fixed;
+	width: 800px;
+	top:20px;
 	z-index: 999;
 	box-shadow:0 0 15px 0 rgba(0,0,0, .09);
 	-moz-box-shadow:0 0 15px 0 rgba(0,0,0, .09);
@@ -217,37 +218,39 @@ div.rCol .after .comment {
 }
 .pdf_form .close, .pdf_form .close:hover {
 	position: absolute; 
-	right: 20px; 
-	top: 20px; 
-	text-decoration: none; 
+	right: 20px;
+	top: 20px;
+	text-decoration: none;
 	width:20px;
 	height:20px;
 	background: url(../images/close-ico.png) 0 0 no-repeat;
 	text-indent: -9999px;
 }
 .pdf_form label{
-	font-size: 16px;
-    font-weight: normal;
+	font-size: 14px;
+	font-weight: bold;
 }
 .pdf_form .close:hover { color: #e6670f }
 .pdf_form h2 { font-size: 1.8em; font-weight: normal; text-align: center; }
 .pdf_form a { background-color: transparent; color: #333; }
-.pdf_form th, .pdf_form td { padding: 0 0 20px; text-align: left; vertical-align: top; }
-.pdf_form th { font-weight: bold; width: 44%;}
-.pdf_form td { text-align: right;}
-.pdf_form input, .pdf_form textarea { width: 92% }
+.pdf_form th, .pdf_form td { padding: 0 0 10px; text-align: left; vertical-align: top; }
+.pdf_form th { font-weight: bold; width: 100px;}
+.pdf_form td { text-align: right; padding-right:40px;}
+.pdf_form input, .pdf_form textarea { width: 380px; }
 .pdf_form .textInput, .pdf_form textarea  { border:1px solid #9aa3ab; }
 .pdf_form .textInput{
 	height:23px;
 	line-height: 23px;
-	padding:0 5px;
-	width:480px;
+	width:380px;
 }
 .pdf_form textarea{
 	padding:5px;
-	width:480px;
+	width:370px;
+	height:35px;
 }
 .pdf_form td .submit { width: auto }
+.pdf_form td .lnbtn { width: auto }
+.pdf_form td .selbt { color:yellow; }
 .pdf_form table span.comment { 
 	display: block;
 	color: #637280;

@@ -73,7 +73,11 @@ $this->pageTitle=Yii::app()->name.' :: '.Yii::t('template', 'MY_PLACE');
 	$selected=$user->getState('selectedHoles', Array());
 	if ($selected || $user->userModel->selected_holes_lists) : ?>
 		<?php
-		$this->renderPartial('_selected', Array('gibdds'=>$selected ? GibddHeads::model()->with('holes')->findAll('holes.id IN ('.implode(',',$selected).')') : Array(),'user'=>$user->userModel));
+			if(Yii::app()->user->getLanguage()=="ru"){
+		$this->renderPartial('_selected', Array('gibdds'=>$selected ? GibddHeads_ru::model()->with('holes')->findAll('holes.id IN ('.implode(',',$selected).')') : Array(),'user'=>$user->userModel));
+			}elseif(Yii::app()->user->getLanguage()=="ua"){
+		$this->renderPartial('_selected', Array('gibdds'=>$selected ? GibddHeads_ua::model()->with('holes')->findAll('holes.id IN ('.implode(',',$selected).')') : Array(),'user'=>$user->userModel));
+			}
 		?>
 	<?php endif;  ?>
 	</div>
