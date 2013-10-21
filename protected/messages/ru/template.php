@@ -24,6 +24,10 @@ return array(
    'MY_PORTFOLIO'=>'Изменить личные данные',
    'DEFECTS_WITH_MY_REQUESTS'=>'Чужие, на которые я отправил заявление',
 
+   'FIRST_NAME' => 'Имя',
+   'LAST_NAME' => 'Фамилия',
+   'EMAIL' => 'Email',
+
    'FIND_BY_ADRESS' => 'Поиск по адресу',   
    'COUNT_IN_COLLECTION'=>'Наша колекция содержит:',
    'HOW_TO_SET_BETTER'=>'Как улучшить<br> эти показатели?',
@@ -34,6 +38,7 @@ return array(
    'GOTO_MAIN'=>'На главную',
    
    'NEWS'=>'Новости',
+   'EVENT'=>'События',
    'USER'=>'Пользователь',
    'USERS'=>'Пользователи',
    'HOLE'=>'Яма',

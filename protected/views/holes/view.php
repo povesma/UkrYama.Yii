@@ -16,12 +16,15 @@ $this->widget('application.extensions.fancybox.EFancyBox', array(
          
 		<div class="rCol">
          <div class="r">
-            <?php if ( Yii::app()->user->isGuest || ($hole->user->getParam('id') && Yii::app()->user->getId() && Yii::app()->user->getId()!=$hole->user->id)):?>
+            <?php 
+//		if ( Yii::app()->user->isGuest || ($hole->user->getParam('id') && Yii::app()->user->getId() && Yii::app()->user->getId()!=$hole->user->id)):
+//		if ( Yii::app()->user->isGuest || ( Yii::app()->user->getId() && Yii::app()->user->getId()!=$hole->user->id)):
+            ?>
             <div class="add-by-user">
       			<span><?php echo Yii::t('template', 'DEFECT_ADDEDBY')?></span>
         	      <?php echo CHtml::link(CHtml::encode($hole->user->getParam('showFullname') ? $hole->user->Fullname : $hole->user->username), array('/profile/view', 'id'=>$hole->user->id),array('class'=>""));?>
             </div>
-            <?php endif;?>
+            <?php //endif;?>
             <div class="control">
                <!-- RIGHT PANEL -->
                <?php $this->renderPartial('_viewrightpanel', array('hole'=>$hole)) ?>
@@ -82,10 +85,11 @@ $this->widget('application.extensions.fancybox.EFancyBox', array(
                      $arr[] = array('date'=>Y::dateFromTime($hole->DATE_CREATED), 'name'=>Yii::t('holes_view', 'HOLE_FIND'));
 
                      $requests = $hole->requests_gibdd;
+
                      if ($requests){
                         foreach ($requests as $request){
-                           $arr[] = array('name'=>CHtml::tag('b', array(), 
-                              Yii::t('holes_view', 'HOLE_REQUEST_USER', array('{0}'=>$request->user->getFullName()))), 
+                           $arr[] = array('name'=>CHtml::tag('b', array(),
+                              Yii::t('holes_view', 'HOLE_REQUEST_USER', array('{0}'=>$request->user->getFullname()))), 
                               'date'=>Y::dateFromTime($request->date_sent));
                            if($request->answers) foreach($request->answers as $answer){
                               $arr[] = array('name'=>Yii::t('holes_view', 'HOLE_ANSWER_DATE'), 'date'=>Y::dateFromTime($answer->date));
@@ -245,7 +249,7 @@ $this->widget('application.extensions.fancybox.EFancyBox', array(
    				echo CHtml::tag('h2', array(), Yii::t('holes_view', 'HOLE_ITBECAME'));
                foreach($hole->pictures_fixed as $i=>$picture){					
                   if ($picture->user_id==Yii::app()->user->id || Yii::app()->user->level > 80 || $hole->IsUserHole)
-                     echo CHtml::link(Yii::t('template', 'DELETE_IMAGE'), Array('delpicture','id'=>$picture->id), Array('class'=>'declarationBtn')).'</br>';
+                     echo CHtml::link(Yii::t('template', 'DELETE_IMAGE'), Array('delpicture','id'=>$picture->id), Array('class'=>'declarationBtn')).'<br />';
    				
                   echo CHtml::link(CHtml::image($picture->medium), 
                      $picture->original, 

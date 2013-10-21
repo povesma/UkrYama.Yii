@@ -50,11 +50,36 @@ echo $form->errorSummary($model); ?>
 	</script>
 
 	<!-- левая колоночка -->
+
 	<div class="lCol main_section">
+<?php if(!(Yii::app()->user->getId())){ ?>
+<table>
+<tr>
+    <td><?= $form->labelEx($model,'EMAIL') ?></td><td><?= $form->textField($model,'EMAIL', array( "style"=>"width:250px")) ?></td>
+    <?= $form->error($model,'EMAIL') ?>
+</tr>
+<tr>
+    <td><?= $form->labelEx($model,'FIRST_NAME') ?></td><td><?= $form->textField($model,'FIRST_NAME',array( "style"=>"width:250px")) ?></td>
+    <?= $form->error($model,'FIRST_NAME') ?>
+
+    <td><?= $form->labelEx($model,'LAST_NAME') ?></td><td><?= $form->textField($model,'LAST_NAME',array( "style"=>"width:200px")) ?></td>
+    <?= $form->error($model,'LAST_NAME') ?>
+</tr>
+</table>
+<?php }else{ ?>
+<?= $form->hiddenField($model,'EMAIL', array("value"=>"1")) ?>
+<?= $form->error($model,'EMAIL') ?>
+
+<?= $form->hiddenField($model,'FIRST_NAME',array("value"=>"1")) ?>
+<?= $form->error($model,'FIRST_NAME') ?>
+
+<?= $form->hiddenField($model,'LAST_NAME',array("value"=>"1")) ?>
+<?= $form->error($model,'LAST_NAME') ?>
+<?php } ?>
 		<div class="form_top_bg clear">
 			<div class="ya_map">
 				<div class="bx-yandex-search-layout wide" style="padding-bottom: 0px;">
-					<div class="bx-yandex-search-form" style="padding-bottom: 0px;">				
+					<div class="bx-yandex-search-form" style="padding-bottom: 0px;">
 							<p><?php echo Yii::t('template', 'ENTER_ADDRES_FOR_SEARCH')?></p>
 							<input type="text" id="address_inp" name="address" class="textInput" value="" style="width: 300px;" />
 							<input type="submit" value="<?php echo Yii::t('template', 'SEARCH')?>" onclick="jsYandexSearch_MAP_DzDvWLBsil.searchByAddress($('#address_inp').val()); return false;" />
@@ -134,15 +159,7 @@ EOD
                <?php echo Yii::t('template', 'ENTER_POINT_TO_MAP_DOBLECLICK')?>					
 				</p>
 			</div>
-		</div>
-
-		<!-- Отдел ГАИ -->
-		<div class="f clearfix">
-		<?php echo $form->labelEx($model,'gibdd_id'); ?>
-		<?php echo $form->dropDownList($model, 'gibdd_id', CHtml::listData( $model->territorialGibdd, 'id', 'gibdd_name' ));?>
-		<?php echo $form->error($model,'gibdd_id'); ?>
-		</div>
-	
+		</div>	
 		<!-- тип дефекта -->
 		<div class="f clearfix">
 			<?php echo $form->labelEx($model,'TYPE_ID'); ?>
@@ -201,7 +218,7 @@ EOD
 		<?php echo $form->hiddenField($model,'ADR_CITY'); ?>
 
 		<div class="addSubmit">
-			<div class="btn" onclick="$(this).parents('form').submit();">
+			<div onclick="$(this).parents('form').submit();">
 				<a class="addFact"><i class="text"><?php echo Yii::t('template', 'SEND')?></i><i class="arrow"></i></a>
 			</div>
 			<p><?php echo Yii::t('template', 'INFO_AFTERSEND')?></p>

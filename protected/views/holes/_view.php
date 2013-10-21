@@ -1,6 +1,6 @@
 <?php 
-echo CHtml::openTag('li', (($index+1)%3==0) ? array('class'=>'noMargin') : array());
 
+echo CHtml::openTag('li', (($index+1)%4==0) ? array('class'=>'noMargin') : array());
    echo CHtml::link(CHtml::image($data->STATE == Holes::STATE_FIXED && $data->pictures_fixed ? $data->pictures_fixed[0]->small : ($data->pictures_fresh ? $data->pictures_fresh[0]->small:'')), array('view', 'id'=>$data->ID), array('class'=>'photo')); 
 
    if (isset($showcheckbox) && $showcheckbox){

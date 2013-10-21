@@ -9,7 +9,7 @@ include ('appConfig.php');
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'name'=>'УкрЯма',
-	'language'=>'ru',
+	'language'=>'ua',
 	'defaultController'=>'holes',
 	// preloading 'log' component
 	//'layout'=>'startpage',
@@ -29,7 +29,7 @@ return array(
 		'application.extensions.fpdf.*',
 		'application.extensions.*',
 		'application.helpers.*',
-	    'ext.eoauth.*',
+	        'ext.eoauth.*',
 		'ext.eoauth.lib.*',
 		'ext.lightopenid.*',
 		'ext.eauth.services.*',
@@ -141,6 +141,8 @@ return array(
 				  '<id:\d+>'=>'holes/view',
 				  'map'=>'holes/map',
 				  'page/<view:\w+>/' => 'site/page',
+				  'kyiv' => 'site/kyiv',
+				  'payment' => 'site/payment',
 				  'userGroups'=>'userGroups',
 				  'gii'=>'gii',
 				  'profile'=>'profile',
@@ -215,7 +217,7 @@ return array(
                 ),
             ),
         ),
-
+/*
 		'log'=>array(
 			'class'=>'CLogRouter',
 			'routes'=>array(
@@ -232,9 +234,10 @@ return array(
             ),
 		//	'enabled'=>isset($_GET['testing'])?true:false,  // enable caching in non-debug mode  
 		),
+*/
 	),
 
 	// application-level parameters that can be accessed
 	// using Yii::app()->params['paramName']
-	'params'=>$params,
+	'params'=>array_merge($params, array("upload_ext"=>array('mp4','flv', 'ogv', 'jpg', 'png', 'jpeg', 'mov', 'webm'), "upload_path"=>'/upload/events/')),
 );

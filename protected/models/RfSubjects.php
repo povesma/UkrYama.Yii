@@ -51,23 +51,15 @@ class RfSubjects extends CActiveRecord
 	{
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
-		if(Yii::app()->user->getLanguage()=="ru"){
 			return array(
-			'gibdd'=>array(self::HAS_ONE, 'GibddHeads_ru', 'subject_id', 'condition'=>'is_regional=1'),//Yii::app()->user->isModer ? '':''
-			'gibdd_local'=>array(self::HAS_MANY, 'GibddHeads_ru', 'subject_id', 'condition'=>Yii::app()->user->isModer ? 'is_regional=0': (!Yii::app()->user->isGuest ? 'is_regional=0 AND (moderated=1 OR author_id='.Yii::app()->user->id.')':'is_regional=0 AND moderated=1')),
-			'gibdd_local_not_moderated' => array(self::STAT, 'GibddHeads_ru', 'subject_id', 'condition'=>'moderated=0'),
+			'gibdd_ru'=>array(self::HAS_ONE, 'GibddHeads_ru', 'subject_id', 'condition'=>'is_regional=1'),//Yii::app()->user->isModer ? '':''
+			'gibdd_local_ru'=>array(self::HAS_MANY, 'GibddHeads_ru', 'subject_id', 'condition'=>Yii::app()->user->isModer ? 'is_regional=0': (!Yii::app()->user->isGuest ? 'is_regional=0 AND (moderated=1 OR author_id='.Yii::app()->user->id.')':'is_regional=0 AND moderated=1')),
+			'gibdd_local_not_moderated_ru' => array(self::STAT, 'GibddHeads_ru', 'subject_id', 'condition'=>'moderated=0'),
+			'gibdd_ua'=>array(self::HAS_ONE, 'GibddHeads_ua', 'subject_id', 'condition'=>'is_regional=1'),//Yii::app()->user->isModer ? '':''
+			'gibdd_local_ua'=>array(self::HAS_MANY, 'GibddHeads_ua', 'subject_id', 'condition'=>Yii::app()->user->isModer ? 'is_regional=0': (!Yii::app()->user->isGuest ? 'is_regional=0 AND (moderated=1 OR author_id='.Yii::app()->user->id.')':'is_regional=0 AND moderated=1')),
+			'gibdd_local_not_moderated_ua' => array(self::STAT, 'GibddHeads_ua', 'subject_id', 'condition'=>'moderated=0'),
 			'prosecutor'=>array(self::HAS_ONE, 'Prosecutors', 'subject_id'),
-		);
-
-		}elseif(Yii::app()->user->getLanguage()=="ua"){
-			return array(
-			'gibdd'=>array(self::HAS_ONE, 'GibddHeads_ua', 'subject_id', 'condition'=>'is_regional=1'),//Yii::app()->user->isModer ? '':''
-			'gibdd_local'=>array(self::HAS_MANY, 'GibddHeads_ua', 'subject_id', 'condition'=>Yii::app()->user->isModer ? 'is_regional=0': (!Yii::app()->user->isGuest ? 'is_regional=0 AND (moderated=1 OR author_id='.Yii::app()->user->id.')':'is_regional=0 AND moderated=1')),
-			'gibdd_local_not_moderated' => array(self::STAT, 'GibddHeads_ua', 'subject_id', 'condition'=>'moderated=0'),
-			'prosecutor'=>array(self::HAS_ONE, 'Prosecutors', 'subject_id'),
-		);
-
-		}
+			);
 	}
 
 	/**
@@ -104,7 +96,7 @@ class RfSubjects extends CActiveRecord
 	
 	public function SearchID($subject_name)
 	{	
-		$s=mb_substr(mb_strtolower(trim($subject_name),'UTF-8'),0,4,'UTF-8');
+		$s=mb_substr(mb_strtolower(trim($subject_name),'UTF-8'),0,6,'UTF-8');
 		if (strlen($s)) {
 			$subj=self::find('LOWER(name_full) LIKE :name', array(':name'=>'%'.$s.'%'));
 			return $subj->id;
@@ -122,16 +114,14 @@ class RfSubjects extends CActiveRecord
 			$city       = '';
 			if
 			(
-				$_address[0] == 'Россия'
-				|| $_address[0] == 'Российская Федерация'
-				|| $_address[0] == 'Russia'
-				|| $_address[0] == 'Russian Federation')
+				$_address[0] == 'Украина'
+				|| $_address[0] == 'Ukraine')
 			{
 				$_address = array_slice($_address, 1);
 			}
 			$_address[0] = trim($_address[0]);
 			// города - субъекты РФ
-			if($_address[0] == 'Москва' || $_address[0] == 'Санкт-Петербург')
+			if($_address[0] == 'Киев' || $_address[0] == 'Севастополь')
 			{
 				$subject_rf  = $this->SearchID($_address[0]);
 				$city        = $_address[0];

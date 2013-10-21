@@ -8,21 +8,21 @@
 									$usermodel=Yii::app()->user->userModel;
 									$model=new HoleRequestForm;
 									$model->form_type='prosecutor2';
-									$model->to=$hole->subject ? $hole->subject->name_full_genitive : '';
+									$model->to_name=$hole->subject ? $hole->subject->name_full_genitive : '';
 									$model->from=$usermodel->relProfile->request_from ? $usermodel->relProfile->request_from : $usermodel->last_name.' '.$usermodel->name.' '.$usermodel->second_name;
 									$model->address=CHtml::encode($hole->ADDRESS);
 									$model->signature=$usermodel->relProfile->request_signature ? $usermodel->relProfile->request_signature : $usermodel->last_name.' '.substr($usermodel->name, 0, 2).($usermodel->name ? '.' : '').' '.substr($usermodel->second_name, 0, 2).($usermodel->second_name ? '.' : '');
-									$model->gibdd=$hole->subject && $hole->subject->gibdd ? $hole->subject->gibdd->gibdd_name : '';
+									$model->gibdd=$hole->subject && $hole->subject->gibdd_ua ? $hole->subject->gibdd_ua->gibdd_name : '';
 									$model->application_data=$hole->request_gibdd ? date('d.m.Y',$hole->request_gibdd->date_sent) : '';
 									$model->postaddress=$usermodel->relProfile->request_address ? $usermodel->relProfile->request_address : '';
 									?>											
 									
 										<?php echo $form->hiddenField($model,'form_type'); ?>
-										<?=  Yii::t('holes_view', 'HOLE_PROSECUTOR_FORM2_PREFACE') ?>
 										<table>
 											<tr>
 												<th><?=  Yii::t('holes_view', 'HOLE_PROSECUTOR_FORM_TO') ?></th>
-												<td><?php echo $form->textArea($model,'to',array('rows'=>3, 'cols'=>40)); ?></td>
+												<td><?php echo $form->textArea($model,'to_name',array('rows'=>3, 'cols'=>40)); ?></td>
+												<td rowspan=8><?=  Yii::t('holes_view', 'HOLE_PROSECUTOR_FORM2_PREFACE') ?></td>
 											</tr>
 											<tr>
 												<th><?=  Yii::t('holes_view', 'HOLE_PROSECUTOR_FORM_FROM') ?></th>
@@ -32,7 +32,7 @@
 												<th><?= Yii::t('holes_view', 'HOLE_PROSECUTOR_FORM_POSTADDRESS') ?></th>
 												<td>
                                                     <?php echo $form->textArea($model,'postaddress',array('rows'=>3, 'cols'=>40)); ?>
-                                                    <span class="comment"><?= Yii::t('holes_view', 'HOLE_PROSECUTOR_FORM_POSTADDRESS_COMMENT') ?></span>
+                                                    <span class="form-comment"><?= Yii::t('holes_view', 'HOLE_PROSECUTOR_FORM_POSTADDRESS_COMMENT') ?></span>
                                                 </td>
 											</tr>
 											<tr>
@@ -44,14 +44,14 @@
 												<th><?= Yii::t('holes_view', 'HOLE_PRESECUTOR_FORM_GIBDD') ?></th>
 												<td>
                                                     <?php echo $form->textArea($model,'gibdd',array('rows'=>3, 'cols'=>40)); ?><?//= $arResult['PROSECUTOR_GIBDD'] ?>
-                                                    <span class="comment"><?= Yii::t('holes_view', 'HOLE_PRESECUTOR_FORM_GIBDD_COMMENT') ?></span>
+                                                    <span class="form-comment"><?= Yii::t('holes_view', 'HOLE_PRESECUTOR_FORM_GIBDD_COMMENT') ?></span>
                                                 </td>
 											</tr>
 											<tr>
 												<th><?= Yii::t('holes_view', 'HOLE_PRESECUTOR_FORM_GIBDD_REPLY') ?></th>
 												<td>
                                                     <?php echo $form->textArea($model,'gibdd_reply',array('rows'=>3, 'cols'=>40)); ?>
-                                                    <span class="comment"><?= Yii::t('holes_view', 'HOLE_PRESECUTOR_FORM_GIBDD_COMMENT2') ?></span>
+                                                    <span class="form-comment"><?= Yii::t('holes_view', 'HOLE_PRESECUTOR_FORM_GIBDD_COMMENT2') ?></span>
                                                 </td>
 											</tr>
 											<tr>
@@ -62,13 +62,14 @@
 												<th><?php echo $form->labelEx($model,'signature'); ?></th>
 												<td>
                                                     <?php echo $form->textField($model,'signature',array('class'=>'textInput')); ?>
-                                                    <span class="comment"><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM_SIGNATURE_COMMENT') ?></span>
+                                                    <span class="form-comment"><?= Yii::t('holes_view', 'HOLE_REQUEST_FORM_SIGNATURE_COMMENT') ?></span>
                                                 </td>
 											</tr>
 											<tr>
 												<th></th>
 												<td>
 													<?php echo CHtml::submitButton(Yii::t('holes_view', 'HOLE_REQUEST_FORM_SUBMIT'), Array('class'=>'submit', 'name'=>'HoleRequestForm[pdf]')); ?>
+												</td><td>
 													<?php echo CHtml::submitButton(Yii::t('holes_view', 'HOLE_REQUEST_FORM_SUBMIT2'), Array('class'=>'submit', 'name'=>'HoleRequestForm[html]')); ?>
 												</td>
 											</tr>

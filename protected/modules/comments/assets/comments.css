@@ -1,15 +1,11 @@
+/* 
+    Document   : comments.css
+    Created on : 11 груд 2011, 19:41:11
+    Author     : segoddnja@gmail.com
+*/
+
 root { 
     display: block;
-}
-
-.comment-avatar{
-	width: 110px;
-	float: left;
-}
-
-.comment-text{
-	padding-left:110px;
-
 }
 
 .comments-list{
@@ -18,7 +14,8 @@ root {
 }
 
 .comments-list .admin-panel{
-	float: right;
+    display: inline;
+    padding: 5px;
 }
 
 .comments-list .comments-list{
@@ -27,16 +24,28 @@ root {
 
 .comments-list li{
     margin: 5px 0;
-    background: #F4F5E6;
+    background: #E5F1F4;
     padding: 5px;
     border-radius: 5px;
 }
 
 .comments-list li:nth-child(2n){
-    background: #F7F7F7;
+    background: #F8F8F8;
 }
 
 .comments-list li .comment-header{
     font-weight: bold;
 }
-.clear{clear: both;}	
+
+.gravatar{
+    float:left;
+    padding-right: 10px;
+}
+
+.comment{
+    height:90px;
+}
+
+.comment-footer{
+    vertical-align: baseline;
+}

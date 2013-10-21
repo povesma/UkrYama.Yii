@@ -3,11 +3,10 @@
  * @author Zasjadko Dmitry <segoddnja@gmail.com>
  */
 
-;
 (function($) {
     /**
 	 * commentsList set function.
-	 * @param options map settings for the comments list. Availablel options are as follows:
+	 * @param options map settings for the comments list. Available options are as follows:
 	 * - deleteConfirmString
          * - approveConfirmString
 	 */
@@ -36,14 +35,14 @@
             })
             .delegate('.approve', 'click', function(){
                 var id = $($(this).parents('.comment-widget')[0]).attr("id");
-                if(confirm($.fn.commentsList.settings[id]['deleteConfirmString']))
+                if(confirm($.fn.commentsList.settings[id]['approveConfirmString']))
                 {
                     $.post($(this).attr('href'))
                     .success(function(data){
                         data = $.parseJSON(data);
                         if(data["code"] === "success")
                         {
-                            $("#comment-"+data["approvedID"]+" > .admin-panel > .approve").remove();
+                            $("#comment-"+data["approvedID"]+" > .comment > .comment-footer > .admin-panel > .approve").remove();
                         }
                     });
                 }
@@ -54,7 +53,7 @@
                 $dialog = $("#addCommentDialog-"+id);
                 var commentID = $(this).attr('rel');
                 if(commentID)
-                    $('.parent_comment_id', $dialog).val(commentID);
+                    $('.parent_id', $dialog).val(commentID);
                 $dialog.dialog("open");
                 return false;
             });
@@ -82,34 +81,35 @@
             'resizable':false,
             'modal':true,
             'buttons':[
-                {
-                    text: $.fn.commentsList.settings[id]['postButton'],
-                    click: function(){
-                        $.fn.commentsList.postComment($(this));
-                    }
-                },
-                {
-                    text: $.fn.commentsList.settings[id]['cancelButton'],
-                    click: function(){
-                        $(this).dialog("close");
-                        return false;
-                    }
+            {
+                text: $.fn.commentsList.settings[id]['postButton'],
+                click: function(){
+                    $.fn.commentsList.postComment($(this));
                 }
+            },
+            {
+                text: $.fn.commentsList.settings[id]['cancelButton'],
+                click: function(){
+                    $(this).dialog("close");
+                    return false;
+                }
+            }
             ]
         });
     }
         
-    $.fn.commentsList.postComment = function($dialog){
+    $.fn.commentsList.postComment = function($dialog,id){
         var $form = $("form", $dialog);
+        id = (typeof id == 'undefined') ? $dialog.data('widgetID') : id;
+        id = (typeof id == 'object') ? id.id : id;
         $.post(
             $form.attr("action"),
             $form.serialize()
             ).success(function(data){
             data = $.parseJSON(data);
+            $('#messagePlaceholder').html(data['message']);
             $dialog.html(data["form"]);
-            if(data["code"] == "success")
-            {
-                var id = $dialog.data('widgetID');
+            if(data["code"] == "success") {
                 $('#'+id).html($(data["list"]).html());
                 $dialog.dialog("close");
             }

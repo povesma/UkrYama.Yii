@@ -53,6 +53,9 @@ class Holes extends CActiveRecord
 	public $type_alias;
 	public $showUserHoles;
 	public $username;
+	public $FIRST_NAME;
+	public $LAST_NAME;
+	public $EMAIL;
 
 	/**
 	 * @return string the associated database table name
@@ -229,11 +232,12 @@ class Holes extends CActiveRecord
 
 		if(Yii::app()->user->getLanguage()=="ru"){
 			$gibdds=GibddHeads_ru::model()->findAll($criteria);
+			if ($this->subject) array_unshift ($gibdds, $this->subject->gibdd_ru);
 		}elseif(Yii::app()->user->getLanguage()=="ua"){
 			$gibdds=GibddHeads_ua::model()->findAll($criteria);
+			if ($this->subject) array_unshift ($gibdds, $this->subject->gibdd_ua);
 		}
 
-		if ($this->subject) array_unshift ($gibdds, $this->subject->gibdd);
 		return $gibdds;
 	}
 		
@@ -577,14 +581,17 @@ class Holes extends CActiveRecord
 			'DATE_STATUS' => Yii::t('template', 'DATE_STATUS'),
 			'COMMENT1' => Yii::t('template', 'COMMENTS'),
 			'COMMENT2' => Yii::t('template', 'COMMENTS'),
-			'TYPE_ID' => Yii::t('holes', 'WIDGET_TYPE_DEFECT'),         
+			'FIRST_NAME' => Yii::t('template', 'FIRST_NAME'),
+			'LAST_NAME' => Yii::t('template', 'LAST_NAME'),
+			'EMAIL' => Yii::t('template', 'EMAIL'),
+			'TYPE_ID' => Yii::t('holes', 'WIDGET_TYPE_DEFECT'),
 			'ADR_SUBJECTRF' => Yii::t('holes', 'WIDGET_DEFAULT_REGION'),
 			'ADR_CITY' => Yii::t('holes', 'WIDGET_DEFAULT_CITY'),
 			'COMMENT_GIBDD_REPLY' => Yii::t('template', 'COMMENT_GIBDD_REPLY'),
 			'GIBDD_REPLY_RECEIVED' => Yii::t('template', 'GIBDD_REPLY_RECEIVED'),
 			'PREMODERATED' => Yii::t('template', 'PREMODERATED'),
 			'NOT_PREMODERATED' =>  Yii::t('template', 'NOT_PREMODERATED'),
-			'DATE_SENT_PROSECUTOR' => Yii::t('template', 'DATE_SENT_PROSECUTOR'),			 
+			'DATE_SENT_PROSECUTOR' => Yii::t('template', 'DATE_SENT_PROSECUTOR'),		 
          
          'deletepict'=> Yii::t('template', 'DELETEPICT'), 
 			'replуfiles'=> Yii::t('template', 'INFO_REPLYFILES'), 
@@ -722,7 +729,7 @@ class Holes extends CActiveRecord
 				        'pageSize'=>$this->limit ? $this->limit : 27,				        
 				    ),
 			'sort'=>array(
-			    'defaultOrder'=>'t.DATE_CREATED DESC',
+			    'defaultOrder'=>'t.ID DESC',
 				)
 		));
 	}

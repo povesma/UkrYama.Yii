@@ -4,10 +4,20 @@ class Printer extends CApplicationComponent
 {
 	public $params = array();
 
+	public function printH2P($html, $css, $outname){
+		$mPDF = Yii::app()->ePdf->mpdf('utf-8', 'A4', '16', 'Arial', 10, 5, 7, 7, 10, 10);
+		$mPDF->charset_in = 'utf-8';
+
+ 		$mPDF->WriteHTML($css, 1);
+		$mPDF->list_indent_first_level = 0; 
+		$mPDF->WriteHTML($html, 2);
+		$mPDF->Output($outname.'.pdf', 'D');
+	}
+
 	public function printPDF($data, $type, $lang, $outname){
 		$html = $this->getTemplate("$type.$lang");
 		$html = $this->parseTemplate($data, $html);
-		$mPDF = Yii::app()->ePdf->mpdf('utf-8', 'A4', '8', '', 10, 10, 7, 7, 10, 10);
+		$mPDF = Yii::app()->ePdf->mpdf('utf-8', 'A4', '16', 'Arial', 10, 5, 7, 7, 10, 10);
 		$mPDF->charset_in = 'utf-8';
 
 		$stylesheet = $this->getCSS($type);

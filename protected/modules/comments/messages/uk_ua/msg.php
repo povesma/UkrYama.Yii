@@ -6,7 +6,7 @@
  */
 return array(
     'Comments'=>'Коментарі',
-    'delete'=>'вилучити',
+    'Delete'=>'вилучити',
     'approve'=>'затвердити',
     'Approve'=>'Затвердити',
     'You cannot add a new comment'=>'Aвторізуйся і напиши коментар',
@@ -21,7 +21,7 @@ return array(
     'Verification Code'=>'Код перевірки',
     //диалоговое окно
     'Add comment'=>'Додати коментар',
-    'Answer comment'=>'Відповісти',
+    'Reply'=>'Відповісти',
     'Delete this comment?'=>'Видалити коментар?',
     'Approve this comment?'=>'Затвердити коментар?',
     'Cancel'=>'Скасувати',

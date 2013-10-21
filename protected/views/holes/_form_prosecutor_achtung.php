@@ -8,11 +8,11 @@
 									$model=new HoleRequestForm;
 									$usermodel=Yii::app()->user->userModel;
 									$model->form_type='prosecutor';
-									$model->to=$hole->subject ? $hole->subject->name_full_genitive : '';
+									$model->to_address=$hole->subject ? $hole->subject->name_full_genitive : '';
 									$model->from=$usermodel->relProfile->request_from ? $usermodel->relProfile->request_from : $usermodel->last_name.' '.$usermodel->name.' '.$usermodel->second_name;
 									$model->address=CHtml::encode($hole->ADDRESS);
 									$model->signature=$usermodel->relProfile->request_signature ? $usermodel->relProfile->request_signature : $usermodel->last_name.' '.substr($usermodel->name, 0, 2).($usermodel->name ? '.' : '').' '.substr($usermodel->second_name, 0, 2).($usermodel->second_name ? '.' : '');
-									$model->gibdd=$hole->subject && $hole->subject->gibdd ? $hole->subject->gibdd->gibdd_name : '';
+									$model->gibdd=$hole->subject && $hole->subject->gibdd_ua ? $hole->subject->gibdd_ua->gibdd_name : '';
 									$model->application_data=$hole->request_gibdd ? date('d.m.Y',$hole->request_gibdd->date_sent) : '';
 									$model->postaddress=$usermodel->relProfile->request_address ? $usermodel->relProfile->request_address : '';
 									?>					
@@ -22,7 +22,7 @@
 								<table>
 									<tr>
 										<th><?=  Yii::t('holes_view', 'HOLE_PROSECUTOR_FORM_TO') ?></th>
-										<td><?php echo $form->textArea($model,'to',array('rows'=>3, 'cols'=>40)); ?></td>
+										<td><?php echo $form->textArea($model,'to_address',array('rows'=>3, 'cols'=>40)); ?></td>
 									</tr>
 									<tr>
 										<th><?=  Yii::t('holes_view', 'HOLE_PROSECUTOR_FORM_FROM') ?></th>

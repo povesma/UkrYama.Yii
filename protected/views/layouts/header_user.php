@@ -60,6 +60,7 @@
                     array('label'=>Yii::t('template', 'HOLETYPES'), 'url'=>array('/holeTypes/index'), 'linkOptions'=>array('class'=>'profileBtn')),
                     array('label'=>Yii::t('template', 'RESULT_OF_REQUESTS'), 'url'=>array('/holeAnswerResults/index'), 'linkOptions'=>array('class'=>'profileBtn')),
                     array('label'=>Yii::t('template', 'COMMENTS'), 'url'=>array('/comments/comment'), 'linkOptions'=>array('class'=>'profileBtn')),
+                    array('label'=>Yii::t('template', 'EVENT'), 'url'=>array('/event/ListEvents'), 'linkOptions'=>array('class'=>'profileBtn')),
                 ),
                 'htmlOptions'=>array('class'=>'operations'),
             ));

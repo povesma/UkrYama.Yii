@@ -41,6 +41,7 @@ $MESS['HOLES_TYPE_NOMARKING']="Отсутствие разметки";
 $MESS['HOLES_TYPE_FENCE']="Ограждение";
 $MESS['HOLES_TYPE_LIGHT']="Светофор";
 $MESS['HOLES_TYPE_BADREPAIR']="Некачественный ремонт дороги";
+$MESS['HOLES_TYPE_UNFINISHED-REPAIR']="Незаконченый ремонт дороги";
 
 
 

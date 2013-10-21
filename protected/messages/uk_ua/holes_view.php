@@ -9,6 +9,7 @@ $MESS['HOLE_TYPE_policeman']  = 'Лежачий поліцейський';
 $MESS['HOLE_TYPE_fence']      = 'Огородження';
 $MESS['HOLE_TYPE_holeinyard'] = 'Яма у дворі';
 $MESS['HOLE_TYPE_light']      = 'Світлофор';
+$MESS['HOLE_TYPE_badrepair']      = 'Неякісний ремонт';
 $MESS['HOLE_REQUEST_SENT']    = 'відправлений запит в ДАІ';
 $MESS['HOLE_ITWAS']           = 'Було';
 $MESS['HOLE_ITBECAME']        = 'Стало';
@@ -27,6 +28,7 @@ $MESS['DAYS5'] = 'днів';
 $MESS['DAYS2'] = 'дня';
 $MESS['DAY']   = 'день';
 $MESS['CLOSE'] = 'Закрити';
+$MESS['SEND_GAI_ONLINE']='Вiдправити в ДАI онлайн!';
 
 $MESS['HOLE_REQUEST_FORM_LANG']                = 'Мова';
 $MESS['HOLE_REQUEST_FORM_TO_NAME']             = 'Кому';
@@ -47,6 +49,9 @@ $MESS['HOLE_REQUEST_FORM_SUBMIT']              = 'Згенерувати PDF-ф�
 $MESS['HOLE_REQUEST_FORM_SUBMIT2']             = 'Текст заяви в HTML';
 $MESS['HOLE_REQUEST_FORM_PRINT_PICTURES']            = 'Виводити зображення до ям';
 $MESS['HOLE_REQUEST_FORM_PRINT_PICTURES_COMMENT']            = 'Позначте, якщо потрібно виводити зображення';
+$MESS['HOLE_REQUEST_FORM_PHOTO']		= 'До заяви буде докладено {0} фото.';
+$MESS['HOLE_REQUEST_FORM_PHOTO_BUTTON']		= 'Обрати потрібні фото';
+
 
 $MESS['PICTURE']				= 'Фотографія';
 $MESS['PICTURE_TO']				= 'до';
@@ -70,7 +75,7 @@ $MESS['PRINT_CLAIM'] = 'Надрукувати заяву';
 $MESS['IF_DEFECT_NOT_FIXED'] = 'Якщо дефект не усунутий';
 $MESS['HOLE_CART_ADMIN_TEXT_OR'] = 'або';
 $MESS['SETNULL_REQUEST_TO_PROSECUTOR'] = 'Анулювати факт відправлення заяви до прокуратури';
-$MESS['WAS_SEND_TO_PROSECUTOR'] ='Скарга в прокуратуру подана';
+$MESS['WAS_REQUEST_TO_PROSECUTOR'] ='Скарга в прокуратуру подана';
 $MESS['NEED_SEND_TO_PROSECUTOR'] = 'Для масовості відправте свою скаргу до прокуратури';
 $MESS['SETNULL_FIX_REQUEST'] = 'Анулювати факт виправлення';
 

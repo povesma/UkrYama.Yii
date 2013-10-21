@@ -39,6 +39,7 @@ $MESS['HOLES_TYPE_NOMARKING']="Відсутність розмітки";
 $MESS['HOLES_TYPE_FENCE']="Огорожа";
 $MESS['HOLES_TYPE_LIGHT']="Світлофор";
 $MESS['HOLES_TYPE_BADREPAIR']="Неякісний ремонт дороги";
+$MESS['HOLES_TYPE_UNFINISHED-REPAIR']      = "Незавершений ремонт дороги";
 
 $MESS['all_news']="Всі новини";
 

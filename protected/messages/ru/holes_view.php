@@ -27,6 +27,7 @@ $MESS['DAYS5'] = 'дней';
 $MESS['DAYS2'] = 'дня';
 $MESS['DAY']   = 'день';
 $MESS['CLOSE'] = 'Закрыть';
+$MESS['SEND_GAI_ONLINE']='Отправить в ГАИ онлайн!';
 
 $MESS['HOLE_REQUEST_FORM_LANG']                = 'Язык';
 $MESS['HOLE_REQUEST_FORM_TO_NAME']             = 'Кому';
@@ -47,6 +48,8 @@ $MESS['HOLE_REQUEST_FORM_SUBMIT']              = 'Сгенерировать PDF
 $MESS['HOLE_REQUEST_FORM_SUBMIT2']             = 'Текст заявления в HTML';
 $MESS['HOLE_REQUEST_FORM_PRINT_PICTURES']      = 'Выводить изображения к ямам';
 $MESS['HOLE_REQUEST_FORM_PRINT_PICTURES_COMMENT']    = 'Отметьте, если нужно выводить изображения';
+$MESS['HOLE_REQUEST_FORM_PHOTO']		= 'К заявлению будет приложено {0} фото.';
+$MESS['HOLE_REQUEST_FORM_PHOTO_BUTTON']		= 'Выбрать нужные фото';
 
 $MESS['PICTURE']				= 'Фотография';
 $MESS['PICTURE_TO']                = 'к';
@@ -69,7 +72,7 @@ $MESS['PRINT_CLAIM'] = 'Напечатать заявление';
 $MESS['IF_DEFECT_NOT_FIXED'] = 'Если дефект не устранён';
 $MESS['HOLE_CART_ADMIN_TEXT_OR'] = 'или';
 $MESS['SETNULL_REQUEST_TO_PROSECUTOR'] = 'Аннулировать факт отправки заявления в прокуратуру';
-$MESS['WAS_SEND_TO_PROSECUTOR'] = 'Жалоба в прокуратуру подана';
+$MESS['WAS_REQUEST_TO_PROSECUTOR'] = 'Жалоба в прокуратуру подана';
 $MESS['NEED_SEND_TO_PROSECUTOR'] = 'Для массовости отправьте свою жалобу в прокуратуру';
 $MESS['SETNULL_FIX_REQUEST'] = 'Аннулировать факт исправления';
 $MESS['SENT_CLAIM_TO_GAI'] = 'Отправлено заявление в ГАИ';

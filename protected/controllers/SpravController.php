@@ -118,7 +118,7 @@ class SpravController extends Controller
 				if (!$model) $model=new GibddHeads_ru();
 			}elseif(Yii::app()->user->getLanguage()=="ua"){
 				$model=GibddHeads_ru::model()->find('subject_id=:s_id',array(':s_id'=>$region->id));
-				if (!$model) $model=new GibddHeads_ru();
+				if (!$model) $model=new GibddHeads_ua();
 			}
 			$model->setAttributes(array(
 				'name'=>$g['region'],
@@ -227,7 +227,12 @@ class SpravController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$model=RfSubjects::model()->with('gibdd')->findAll(Array('order'=>'t.region_num','together'=>true));
+		if(Yii::app()->user->getLanguage()=="ru"){
+		$model=RfSubjects::model()->with('gibdd_ru')->findAll(Array('order'=>'t.region_num','together'=>true));
+		}elseif(Yii::app()->user->getLanguage()=="ua"){
+		$model=RfSubjects::model()->with('gibdd_ua')->findAll(Array('order'=>'t.region_num','together'=>true));
+		}
+
 		$this->render('index',array(
 			'model'=>$model,
 		));

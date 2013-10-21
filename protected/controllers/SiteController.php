@@ -20,6 +20,8 @@ class SiteController extends Controller
 			'page'=>array(
 				'class'=>'CViewAction',
 			),
+			'kyiv'=>array('class'=>'CViewAction', 'defaultView'=> 'kyiv'),
+			'payment'=>array('class'=>'CViewAction', 'defaultView'=> 'poll01'),
 		);
 	}
 

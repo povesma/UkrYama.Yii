@@ -172,7 +172,7 @@ div.rCol .after h2 {
 	padding-top: 1.5em;
 }
 
-div.rCol .after .comment {
+div.rCol .after .form-comment {
 	/*border-top: 1px solid #fff;
 	float: left;
 	left: -240px;
@@ -210,11 +210,13 @@ div.rCol .after .comment {
 	padding: 20px 20px;
 	position: fixed;
 	width: 800px;
-	top:20px;
+	top:0px;
 	z-index: 999;
 	box-shadow:0 0 15px 0 rgba(0,0,0, .09);
 	-moz-box-shadow:0 0 15px 0 rgba(0,0,0, .09);
 	-webkit-box-shadow:0 0 15px 0 rgba(0,0,0, .09);
+	overflow:scroll;
+	height:100%;
 }
 .pdf_form .close, .pdf_form .close:hover {
 	position: absolute; 
@@ -251,7 +253,7 @@ div.rCol .after .comment {
 .pdf_form td .submit { width: auto }
 .pdf_form td .lnbtn { width: auto }
 .pdf_form td .selbt { color:yellow; }
-.pdf_form table span.comment { 
+.pdf_form table span.form-comment { 
 	display: block;
 	color: #637280;
 	font-size: 12px;
@@ -259,7 +261,33 @@ div.rCol .after .comment {
 	line-height: 1.17em;
 	margin-top: 3px;
 }
+.form_pics{
+	display: none;
+}
 
+.form_pics ul{
+	display: inline;
+}
+.form_pics li{
+	list-style: none;
+	display: inline;
+}
+.form_pics input[type="checkbox"]{
+	display:none;
+}
+.form_pics a{
+	position:relative;
+}
+
+.form_pics .t_pic{
+	z-index:1;
+}
+.form_pics .tic{
+	position:absolute;
+	z-index:2;
+	top:-12px;
+	right:4px;
+}
 div.rCol .before:after, div.rCol .after:after {
 	content: ".";
 	display: block;
@@ -302,8 +330,8 @@ div.rCol .before:after, div.rCol .after:after {
     width: 215px;
 }
 
-a.holes_pict:active { background: none; }
-a.holes_pict {
+.holes_pict a:active { background: none; }
+.holes_pict_p {
     position: relative;
     float: left;
 }

@@ -313,7 +313,7 @@ class XmlController extends Controller
 		$model->COMMENT1=$comment;
 		if (!$gibdd_id){
 			$subjmodel=RfSubjects::model()->findByPk($subject_rf);
-			if ($subjmodel) $model->gibdd_id=$subjmodel->gibdd->id;
+			if ($subjmodel) $model->gibdd_id=$subjmodel->gibdd_ru->id;
 			else $model->gibdd_id=0;
 			}
 		else $model->gibdd_id=$gibdd_id;
@@ -517,7 +517,7 @@ class XmlController extends Controller
 			case 'pdf_gibdd':
 			{
 				$attribs=Array(				
-				'to'=>Yii::app()->request->getParam('to'),
+				'to_name'=>Yii::app()->request->getParam('to'),
 				'from'=>Yii::app()->request->getParam('from'),
 				'postaddress'=>Yii::app()->request->getParam('postaddress'),
 				'address'=>Yii::app()->request->getParam('holeaddress') ? Yii::app()->request->getParam('holeaddress') : $model->ADDRESS,

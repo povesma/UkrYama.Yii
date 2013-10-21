@@ -45,6 +45,9 @@ function langChange(val,btn){
 	});
 }
 </script>
+         		<div class="lc">
+         			<a href="/payment" class="button"><?= Yii::t('holes_view', 'SEND_GAI_ONLINE')?><sub>*</sub></a>
+         		</div><br />
 
    <?php if(!Yii::app()->user->isGuest){ 
       switch($hole->STATE){
@@ -53,11 +56,12 @@ function langChange(val,btn){
 	         //endif; ?>
          	<div class="progress">
          		<div class="lc">
-         			<a href="#" onclick="var c=document.getElementById('pdf_form');if(c){c.style.display=c.style.display=='block'?'none':'block';c.focus()}return false;" class="printDeclaration"><?= Yii::t('holes_view', 'PRINT_CLAIM') ?></a>
-         		</div>
+         			<a href="#" onclick="var c=document.getElementById('pdf_form');if(c){c.style.display=c.style.display=='block'?'none':'block';c.focus()}return false;" class="button"><?= Yii::t('holes_view', 'PRINT_CLAIM') ?></a>
+         		</div><br />
          		<div class="cc">
          			<?php 
-                  echo CHtml::tag('p', array(), CHtml::link(Yii::t('holes_view', 'CLAIM_TO_GAI_WAS_SEND'), array('sent', 'id'=>$hole->ID),array('class'=>"declarationBtn")));
+			$this->widget('application.widgets.holesent.HoleSent', array('hole'=>$hole));
+                  echo CHtml::tag('p', array(), CHtml::link(Yii::t('holes_view', 'CLAIM_TO_GAI_WAS_SEND'), "#", array('class'=>"declarationBtn",'onClick'=>"holesent.style['display']='inline';this.style['display']='none';")));
                   if($hole->IsUserHole || Yii::app()->user->isAdmin)
    			         echo CHtml::tag('p', array(), CHtml::link(Yii::t('holes_view', 'SET_DEFECT_AS_FIXED'), array('fix', 'id'=>$hole->ID),array('class'=>"declarationBtn"))); ?>
          		</div>

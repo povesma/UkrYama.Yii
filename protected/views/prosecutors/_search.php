@@ -16,18 +16,18 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'subject_id'); ?>
-		<?php echo $form->textField($model,'subject_id'); ?>
+		<?php echo $form->label($model,'region_id'); ?>
+		<?php echo $form->textField($model,'region_id'); ?>
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'preview_text'); ?>
-		<?php echo $form->textArea($model,'preview_text',array('rows'=>6, 'cols'=>50)); ?>
+		<?php echo $form->label($model,'address'); ?>
+		<?php echo $form->textArea($model,'address',array('rows'=>6, 'cols'=>50)); ?>
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'gibdd_name'); ?>
-		<?php echo $form->textField($model,'gibdd_name',array('size'=>60,'maxlength'=>255)); ?>
+		<?php echo $form->label($model,'type'); ?>
+		<?php echo $form->textField($model,'type',array('size'=>60,'maxlength'=>255)); ?>
 	</div>
 
 	<div class="row buttons">
