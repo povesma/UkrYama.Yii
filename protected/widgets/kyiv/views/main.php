@@ -309,7 +309,7 @@ $model=new CommunityForm;
     <td></td>
 </tr>
 <tr>
-    <td><?php echo $form->labelEx($model,'address'); ?><br><input name=address id=address><input name=paddress type=hidden id=paddress><br><input type=
+    <td><?php echo $form->labelEx($model,'address'); ?><br><input name=address id=address><input name=paddress type=hidden id=paddress><br><input type=button 
  value="^ ^ ^" onClick="addAddress()"></td><td></td><td><label>Категорiя недолiку</label></td>
     <?php echo $form->error($model,'address'); ?>
 </tr>

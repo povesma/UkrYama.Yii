@@ -27,7 +27,7 @@ class HoleTypes extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('id, lang, alias, name', 'required'),
+			array('id, lang, alias, name, published', 'required'),
 			array('id', 'numerical', 'integerOnly'=>true),
 			array('lang', 'length', 'max'=>45),
 			array('alias, name', 'length', 'max'=>255),

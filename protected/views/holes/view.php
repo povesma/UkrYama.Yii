@@ -1,4 +1,4 @@
-<?
+<?php
 $this->pageTitle=Yii::app()->name.' :: '.Yii::t('template', 'DEFECT_CARD');
 
 $this->widget('application.extensions.fancybox.EFancyBox', array(
@@ -85,12 +85,23 @@ $this->widget('application.extensions.fancybox.EFancyBox', array(
                      $arr[] = array('date'=>Y::dateFromTime($hole->DATE_CREATED), 'name'=>Yii::t('holes_view', 'HOLE_FIND'));
 
                      $requests = $hole->requests_gibdd;
-
+		     $requestStatus = $hole->request_sent;
+		     if(!$requestStatus[0]->status && count($requestStatus)){
+			$requestStatus[0]->updateMail();
+		     }
                      if ($requests){
                         foreach ($requests as $request){
                            $arr[] = array('name'=>CHtml::tag('b', array(),
                               Yii::t('holes_view', 'HOLE_REQUEST_USER', array('{0}'=>$request->user->getFullname()))), 
                               'date'=>Y::dateFromTime($request->date_sent));
+				if($requestStatus[0]->status){
+						if($requestStatus[0]->status!=2){
+							$arr[] = array('name'=>Yii::t('holes_view', 'HOLE_REQUEST_DELIVERDATE'), 'date'=>Y::dateFromTime($requestStatus[0]->ddate));
+						}
+			        }else{
+					$arr[] = array('name'=>Yii::t('holes_view', 'HOLE_REQUEST_DELIVERDATE'), 'date'=>Yii::t('holes_view', 'HOLE_REQUEST_NOTDELIVERED'));
+				}
+				
                            if($request->answers) foreach($request->answers as $answer){
                               $arr[] = array('name'=>Yii::t('holes_view', 'HOLE_ANSWER_DATE'), 'date'=>Y::dateFromTime($answer->date));
                               $arr[] = array('name'=>Yii::t('holes_view', 'HOLE_ANSWER_CREATEDATE'), 'date'=>Y::dateTimeFromTime($answer->createdate));

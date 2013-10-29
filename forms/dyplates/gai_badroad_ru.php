@@ -31,14 +31,15 @@
 </div>
 </td></tr>
 <tr><td colspan=2 class="smv-spacer"></td></tr>
+<?php if($c_photos): ?>
+<tr><td class="attach">Приложение: фото недостатков дороги, <?= $c_photos ?> шт.</td></tr>
+<?php endif;?>
+
 <tr>
 	<td class="date"><?= $date ?> г.</td>
 	<td class="init"><?= $init ?></td>
 </tr>
 <tr><td colspan=2 class="v-spacer"></td></tr>
-<?php if($c_photos): ?>
-<tr><td class="attach">Приложение: <?= $c_photos ?> фотографии</td></tr>
-<?php endif;?>
 </table>
 <?php if($c_photos): ?>
 <pagebreak />

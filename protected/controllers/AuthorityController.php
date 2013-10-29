@@ -85,16 +85,46 @@ class AuthorityController extends Controller
 		if(isset($_POST['HoleTypes']))
 		{
 			$model->attributes=$_POST['HoleTypes'];
-			if($model->validate())
-			{
-				// form inputs are valid, do something here
-			try{
-				$model->save();
-			}
-			catch (Exception $e)
-			{
-				$err= "some error ".$e->getMessage();
-			}
+			switch($_POST['subBtn']){
+				case "Add":
+					if($model->validate())
+					{
+						try{
+							$model->save();
+							$err="Created";
+						}
+						catch (Exception $e)
+						{
+							$err= "some error ".$e->getMessage();
+						}
+					}
+					break;
+				case "Edit":
+					if($model->validate())
+					{
+						try{
+						$rec=$model->find('id=:id and lang=:lang',array(':id'=>$model->id,':lang'=>$model->lang));
+						$rec->attributes=$model->attributes;
+						$rec->update();
+							$err="Updated";
+						}
+						catch (Exception $e)
+						{
+							$err= "some error ".$e->getMessage();
+						}
+					}
+				break;
+				case "Delete":
+					try{
+						$rec=$model->find('id=:id and lang=:lang',array(':id'=>$model->id,':lang'=>$model->lang));
+						$rec->delete();
+						$err="Deleted";
+					}
+					catch (Exception $e)
+					{
+						$err= "some error ".$e->getMessage();
+					}
+				break;
 			}
 		}
 		$this->render('holetypes',array('model'=>$model,'err'=>$err));

@@ -130,6 +130,7 @@ class Holes extends CActiveRecord
 			'request_gibdd'=>array(self::HAS_ONE, 'HoleRequests', 'hole_id', 'condition'=>'request_gibdd.type="gibdd" AND request_gibdd.user_id='.Yii::app()->user->id),
 			'request_prosecutor'=>array(self::HAS_ONE, 'HoleRequests', 'hole_id', 'condition'=>'request_prosecutor.type="prosecutor" AND user_id='.Yii::app()->user->id),
 			'requests_gibdd'=>array(self::HAS_MANY, 'HoleRequests', 'hole_id', 'condition'=>'requests_gibdd.type="gibdd"','order'=>'requests_gibdd.date_sent ASC'),
+			'request_sent'=>array(self::HAS_MANY, 'HoleRequestSent', 'hole_id','order'=>'request_sent.ddate ASC'),
 			'requests_prosecutor'=>array(self::HAS_MANY, 'HoleRequests', 'hole_id', 'condition'=>'requests_prosecutor.type="prosecutor"','order'=>'date_sent ASC'),
 			'fixeds'=>array(self::HAS_MANY, 'HoleFixeds', 'hole_id','order'=>'fixeds.date_fix DESC'),
 			'user_fix'=>array(self::HAS_ONE, 'HoleFixeds', 'hole_id', 'condition'=>'user_fix.user_id='.Yii::app()->user->id),
@@ -401,7 +402,7 @@ class Holes extends CActiveRecord
 
 	}	
 	
-	public function makeRequest($type){
+	public function makeRequest($type,$date){
 		$attr='request_'.$type;
 		if (!$this->$attr){
 			$request=new HoleRequests;
@@ -410,7 +411,7 @@ class Holes extends CActiveRecord
 							'user_id'=>Yii::app()->user->id,
 							//'gibdd_id'=>$this->subject ? $this->subject->gibdd->id : 0,
 							'gibdd_id'=>$this->gibdd_id,
-							'date_sent'=>time(),
+							'date_sent'=>$date,
 							'type'=>$type,
 							);
 			if ($request->save()){

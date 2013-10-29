@@ -87,7 +87,7 @@ echo $form->errorSummary($model); ?>
 					</div>		
 					<div class="full_adress">
 						<div class="bx-yandex-search-results" id="results_MAP_DzDvWLBsil"></div>
-					</div>	
+					</div>
 				</div>	
 				<div class="f">
 					<div class="full_adress">

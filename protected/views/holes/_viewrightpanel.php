@@ -61,7 +61,7 @@ function langChange(val,btn){
          		<div class="cc">
          			<?php 
 			$this->widget('application.widgets.holesent.HoleSent', array('hole'=>$hole));
-                  echo CHtml::tag('p', array(), CHtml::link(Yii::t('holes_view', 'CLAIM_TO_GAI_WAS_SEND'), "#", array('class'=>"declarationBtn",'onClick'=>"holesent.style['display']='inline';this.style['display']='none';")));
+                  echo CHtml::tag('p', array(), CHtml::link(Yii::t('holes_view', 'CLAIM_TO_GAI_WAS_SEND'), "javascript:void(0)", array('class'=>"declarationBtn",'onClick'=>"holesent.style['display']='inline';this.style['display']='none';")));
                   if($hole->IsUserHole || Yii::app()->user->isAdmin)
    			         echo CHtml::tag('p', array(), CHtml::link(Yii::t('holes_view', 'SET_DEFECT_AS_FIXED'), array('fix', 'id'=>$hole->ID),array('class'=>"declarationBtn"))); ?>
          		</div>

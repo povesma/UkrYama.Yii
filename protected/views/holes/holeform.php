@@ -160,6 +160,97 @@ function addAddress(){
 <?= $form->error($model,'LAST_NAME') ?>
 <?php } ?>
 		<div class="form_top_bg clear">
+			<div class="google-search-form" style="padding-bottom: 0px;">
+				<table>
+				<tr>
+					<td><div style="width:270px"><?= Yii::t('template', 'ENTER_ADDRES_FOR_SEARCH')?></div></td>
+					<td><input type="text" id="address_inp" name="address" class="textInput" value="" style="width: 300px;" /></td>
+					<td><input type="submit" value="<?php echo Yii::t('template', 'SEARCH')?>" onclick="return false;" /></td>
+				</tr>
+				<tr>
+					<td colspan=3><button style="display:none;" id="clear_result" onclick="return false;"><?php echo Yii::t('template', 'CLEAR')?></button></td>
+				</tr>
+				<tr><td colspan=3>
+					<div class="full_adress">
+						<div class="bx-google-search-results" id="results_MAP"></div>
+					</div>
+				</td></tr>
+				</table>
+			</div>	
 			<div id="map-canvas"></div>
+			<!-- адрес -->
+			<div class="f">
+				<?php echo $form->labelEx($model,'ADDRESS'); ?>
+				<?php echo $form->textField($model,'ADDRESS',array('class'=>'textInput')); ?>
+				<?php echo $form->error($model,'ADDRESS'); ?>	
+				<p class="tip">
+               <?php echo Yii::t('template', 'ENTER_POINT_TO_MAP_DOBLECLICK')?>					
+				</p>
+			</div>
 		</div>
+			
+		<!-- тип дефекта -->
+		<div class="f clearfix">
+			<?php echo $form->labelEx($model,'TYPE_ID'); ?>
+
+			<ul class="defect_type clearfix"> 
+         <?php 
+				$data = CHtml::listData(HoleTypes::getTypes(), 'id','alias');
+				foreach($data as $id => $alias){
+				   $name = Yii::t('holes','HOLES_TYPE_'.strtoupper($alias));
+
+               echo CHtml::tag('li', array('style'=>'float:none'), 
+                  CHtml::radioButton(
+                     'Holes[TYPE_ID]', 
+                     $model->TYPE_ID == $id, 
+                     array('value'=>$id, 'id'=>'type_'.$alias)
+                  ).
+                  CHtml::label($name, 'type_'.$alias)                  
+               );
+				}
+			?> 
+		         </ul>
+			<?php echo $form->error($model,'TYPE_ID'); ?>
+		</div>
+	
+		
+		<!-- Дата обнаружения -->
+		<div class="f clearfix">
+		<?php echo $form->labelEx($model,'DATE_CREATED'); ?>
+      <?php echo CHtml::textField('defectdate', date(C_DATEFORMAT, $model->DATE_CREATED)); ?>
+		<?php echo $form->error($model,'DATE_CREATED'); ?>
+		</div>
+
+      <script>
+         $('#defectdate').datepicker({dateFormat: '<?php  echo C_DATEFORMAT_JS ?>'});
+      </script>
+         	
+		<!-- фотки -->
+		<div class="f clearfix">
+			<?php echo $form->labelEx($model,'upploadedPictures'); ?>
+			<?php $this->widget('CMultiFileUpload', array('accept'=>'gif|jpg|png', 'model'=>$model, 'attribute'=>'upploadedPictures', 'htmlOptions'=>array('class'=>'mf'), 'denied'=>Yii::t('mf','Невозможно загрузить этот файл'),'duplicate'=>Yii::t('mf','Файл уже существует'),'remove'=>Yii::t('mf','удалить'),'selected'=>Yii::t('mf','Файлы: $file'),)); ?>			
+			<p class="tip">
+            <?php echo Yii::t('template', 'ENTER_PHOTO_REMARK')?>	         
+         </p>			
+		</div>
+		
+		<!-- камент -->
+		<div class="f">
+			<?php echo $form->labelEx($model,'COMMENT1'); ?>
+			<?php echo $form->textArea($model,'COMMENT1'); ?>
+			<?php echo $form->error($model,'COMMENT1'); ?>
+		</div>
+		<?php echo $form->hiddenField($model,'LATITUDE'); ?>
+		<?php echo $form->hiddenField($model,'LONGITUDE'); ?>
+		<?php echo $form->hiddenField($model,'STR_SUBJECTRF'); ?>
+		<?php echo $form->hiddenField($model,'ADR_CITY'); ?>
+
+		<div class="addSubmit">
+			<div onclick="$(this).parents('form').submit();">
+				<a class="addFact"><i class="text"><?php echo Yii::t('template', 'SEND')?></i><i class="arrow"></i></a>
+			</div>
+			<p><?php echo Yii::t('template', 'INFO_AFTERSEND')?></p>
+		</div>
+	</div>
+	<!-- /левая колоночка -->
 <?php $this->endWidget(); ?>

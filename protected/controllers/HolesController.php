@@ -31,7 +31,7 @@ class HolesController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('update', 'personal','personalDelete','request','langChange','requestForm','sent','notsent','gibddreply', 'fix', 'defix', 'prosecutorsent', 'prosecutornotsent','delanswerfile','myarea', 'delpicture','selectHoles','sentMany','review'),
+				'actions'=>array('TrackMail','update', 'personal','personalDelete','request','langChange','requestForm','sent','notsent','gibddreply', 'fix', 'defix', 'prosecutorsent', 'prosecutornotsent','delanswerfile','myarea', 'delpicture','selectHoles','sentMany','review'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -212,6 +212,7 @@ class HolesController extends Controller
 	//Список ГИБДД возле ямы
 	public function actionTerritorialGibdd()
 	{
+/*
 	if(isset($_POST['Holes'])) {
 		$address=split(", ",$_POST['Holes']['ADDRESS']);
 		foreach($address as $sub){
@@ -220,7 +221,7 @@ class HolesController extends Controller
 			echo $region->name;
 		}
 	}
-/*
+*/
 		if(isset($_POST['Holes'])) {
 			$model=new Holes;
 			$model->attributes=$_POST['Holes'];
@@ -239,7 +240,6 @@ class HolesController extends Controller
 		    }
 			
 		}
-*/
 	}
 
 	/**
@@ -538,7 +538,7 @@ class HolesController extends Controller
 
 				$photos = "";
 				$pnum=1;
-
+				$images=array();
 				foreach($model->pictures_fresh as $picture){
 					$pid = $picture->id;
 					foreach($pics as $pic){
@@ -560,7 +560,11 @@ class HolesController extends Controller
 							        $pfile=$filename.".rotated.".$matches[0];
 								$image->save(Yii::getPathOfAlias('webroot').$pfile);
 							}
-							$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="'.$pfile.'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+							if($request->html){
+								$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="'.$pfile.'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+							}else{
+$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="data:image/jpg;base64,'.base64_encode(file_get_contents(Yii::getPathOfAlias('webroot').$pfile)).'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+							}
 						$pnum++;
 						}
 					}
@@ -596,7 +600,13 @@ class HolesController extends Controller
 				{
 					header('Content-Type: text/html; charset=utf8', true);
 					$printer = Yii::app()->Printer;
-					echo $printer->printHTML($_data, $formType, $lang);
+//					echo $printer->printHTML($_data, $formType, $lang);
+					$name="$formType"."_$lang";
+					$tplname = YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$name.".php";
+					$css = file_get_contents(YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$formType.".css"); 
+					$html = $this->renderFile($tplname,$_data,true);
+					$html = "<style>$css</style>\n$html";
+					echo $html;
 					return;
 				}//end print html
 				else
@@ -604,11 +614,13 @@ class HolesController extends Controller
 					$printer = Yii::app()->Printer;
 //					$filename="ukryama-".date("Y-m-d_G-i-s");
 //					echo $printer->printPDF($_data, $formType, $lang, $filename);
-					$name="$formType.$lang";
-					$tplname = YiiBase::getPathOfAlias($printer->params['templates'])."/templates/".$name.".tpl.php";
+
+					$name="$formType"."_$lang";
+					$tplname = YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$name.".php";
 					if(file_exists($tplname)){
-						$css = file_get_contents(YiiBase::getPathOfAlias($printer->params['templates'])."/css/".$formType.".css"); 
+						$css = file_get_contents(YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$formType.".css"); 
 						$html = $this->renderFile($tplname,$_data,true);
+
 						$outname="ukryama-".date("Y-m-d_G-i-s");
 						echo $printer->printH2P($html, $css, $outname);
 						return;
@@ -666,13 +678,71 @@ class HolesController extends Controller
 			if ($ok==count($holes))  echo 'ok';
 		}
 	}
-	
+
+	public function trackMail($id){
+		$http=new Http;
+		$url="http://services.ukrposhta.com/barcodesingle/default.aspx?ctl00%24centerContent%24scriptManager=ctl00%24centerContent%24scriptManager%7Cctl00%24centerContent%24btnFindBarcodeInfo&__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=%2FwEPDwULLTEzNTgyOTE0MTcPZBYCZg9kFgICAw9kFgYCAQ8WAh4FY2xhc3MFBmxvZ29VS2QCAw8WAh4HVmlzaWJsZWgWAmYPZBYCAgEPZBYCAgEPDxYCHgRUZXh0BVXQktGW0LTRgdGC0LXQttC10L3QvdGPINC%2F0LXRgNC10YHQuNC70LDQvdC90Y8g0L%2FQvtGI0YLQvtCy0LjRhSDQstGW0LTQv9GA0LDQstC70LXQvdGMZGQCBQ9kFgYCAQ8PFgIfAgUe0KjQsNC90L7QstC90ZYg0LrQu9GW0ZTQvdGC0LghZGQCAg8WAh4JaW5uZXJodG1sBcEEJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A70JLQuCDQvNC%2B0LbQtdGC0LUg0LTRltC30L3QsNGC0LjRgdGPINC%2F0YDQviDQvNGW0YHRhtC10LfQvdCw0YXQvtC00LbQtdC90L3RjyDRgtCwINGB0YLQsNC9INC%2F0L7RiNGC0L7QstC%2B0LPQviDQstGW0LTQv9GA0LDQstC70LXQvdC90Y8sINGJ0L4gPGJyLz4g0YDQvtC30YjRg9C60YPRlNGC0YzRgdGPLCDRgyDQsdGD0LTRjC3Rj9C60LjQuSDQt9GA0YPRh9C90LjQuSDQtNC70Y8g0JLQsNGBINGH0LDRgS4gPGJyIC8%2BIDxiciAvPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO9CG0L3RhNC%2B0YDQvNCw0YbRltGOINC80L7QttC90LAg0L7RgtGA0LjQvNCw0YLQuCDQv9GA0L46IDxiciAvPmQCAw9kFggCAQ8WAh8DBY0TJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7LSDQstC90YPRgtGA0ZbRiNC90ZYg0YDQtdGU0YHRgtGA0L7QstCw0L3RliDQv9C%2B0YjRgtC%2B0LLRliDQstGW0LTQv9GA0LDQstC70LXQvdC90Y8sINGJ0L4g0L%2FQtdGA0LXRgdC40LvQsNGO0YLRjNGB0Y8g0LIg0LzQtdC20LDRhSDQo9C60YDQsNGX0L3QuDs8YnIvPg0KICAgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7LSDQvNGW0LbQvdCw0YDQvtC00L3RliDRgNC10ZTRgdGC0YDQvtCy0LDQvdGWINC%2F0L7RiNGC0L7QstGWINCy0ZbQtNC%2F0YDQsNCy0LvQtdC90L3Rjywg0YnQviDQv9C10YDQtdGB0LjQu9Cw0Y7RgtGM0YHRjyDQt9CwINC80LXQttGWINCj0LrRgNCw0ZfQvdC4Ozxici8%2BDQogICAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDstINC80ZbQttC90LDRgNC%2B0LTQvdGWINGA0LXRlNGB0YLRgNC%2B0LLQsNC90ZYg0L%2FQvtGI0YLQvtCy0ZYg0LLRltC00L%2FRgNCw0LLQu9C10L3QvdGPLCDRidC%2BINC90LDQtNGW0LnRiNC70Lgg0LIg0KPQutGA0LDRl9C90YMuPGJyLz48YnIvPg0KICAgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A70KPQstC10LTRltGC0YwsINCx0YPQtNGMLdC70LDRgdC60LAsINCx0LXQtyDQv9GA0L7Qv9GD0YHQutGW0LImbmJzcDsg0YLQsCDRltC90YjQuNGFINGB0LjQvNCy0L7Qu9GW0LIg0L%2FQvtCy0L3QuNC5ICZuYnNwOzxiPjEzLdGB0LjQvNCy0L7Qu9GM0L3QuNC5PC9iPiDQsdGD0LrQstC10L3Qvi3RhtC40YTRgNC%2B0LLQuNC5INC90L7QvNC10YAgKNGI0YLRgNC40YXQutC%2B0LTQvtCy0LjQuSDRltC00LXQvdGC0LjRhNGW0LrQsNGC0L7RgCkg0L%2FQvtGI0YLQvtCy0L7Qs9C%2BINCy0ZbQtNC%2F0YDQsNCy0LvQtdC90L3Rjywg0Y%2FQutC40Lkg0LfQsNC30L3QsNGH0LXQvdC%2BJm5ic3A7INC90LAmbmJzcDsg0JLQsNGI0L7QvNGDJm5ic3A7INGA0L7Qt9GA0LDRhdGD0L3QutC%2B0LLQvtC80YMmbmJzcDsg0LTQvtC60YPQvNC10L3RgtGWJm5ic3A7ICjQutCw0YHQvtCy0L7QvNGDINGH0LXQutGDLCDRgNC%2B0LfRgNCw0YXRg9C90LrQvtCy0ZbQuSDQutCy0LjRgtCw0L3RhtGW0Zcg0YLQvtGJ0L4pINGC0LAg0L3QsNGC0LjRgdC90ZbRgtGMINC90LAg0LrQvdC%2B0L%2FQutGDIMKr0J%2FQvtGI0YPQusK7INCw0LHQviDQutC70LDQstGW0YjRgyDCq0VudGVywrsuPGJyLz48YnIvPg0KICAgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A70IbQtNC10L3RgtC40YTRltC60LDRgtC%2B0YAmbmJzcDsg0LzRltC20L3QsNGA0L7QtNC90L7Qs9C%2BINC%2F0L7RiNGC0L7QstC%2B0LPQviDQstGW0LTQv9GA0LDQstC70LXQvdC90Y8g0LzRltGB0YLQuNGC0YwgMTMg0YHQuNC80LLQvtC70ZbQsiwg0Lcg0L3QuNGFOiAxLdC5INGC0LAgMi3QuSDRgdC40LzQstC%2B0LvQuCDigJQg0LHRg9C60LLQuDsg0LcgMy3Qs9C%2BINC%2F0L4gMTEt0Lkg4oCUINGG0LjRhNGA0Lg7IDEyLdC5INGC0LAgMTMt0Lkg4oCUINCx0YPQutCy0LgsINGP0LrRliDQstGW0LTQvtCx0YDQsNC20LDRjtGC0Ywg0LrQvtC0INC60YDQsNGX0L3QuC3QstGW0LTQv9GA0LDQstC90LjQutCwICjQvdCw0L%2FRgNC40LrQu9Cw0LQsIFVBIOKAlCDQo9C60YDQsNGX0L3QsCwgUlUg4oCUINCg0L7RgdGW0Y8sIFVTIOKAlCDQodCo0JAsIElMIOKAlCDQhtC30YDQsNGX0LvRjCDRgtC%2B0YnQvikuPGJyLz48YnIvPg0KICAgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A70IbQtNC10L3RgtC40YTRltC60LDRgtC%2B0YAg0LLQvdGD0YLRgNGW0YjQvdGM0L7Qs9C%2BINC%2F0L7RiNGC0L7QstC%2B0LPQviDQstGW0LTQv9GA0LDQstC70LXQvdC90Y8g0YHQutC70LDQtNCw0ZTRgtGM0YHRjyDQtyAxMyDRhtC40YTRgC48YnIvPjxici8%2BDQogICAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDvQn9GA0LjQutC70LDQtCDQvdC%2B0LzQtdGA0LAg0LzRltC20L3QsNGA0L7QtNC90L7Qs9C%2BINCy0ZbQtNC%2F0YDQsNCy0LvQtdC90L3RjzogIENBMTIzNDU2Nzg5VUEgPGJyLz4NCiAgICZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO9Cy0L3Rg9GC0YDRltGI0L3RjNC%2B0LPQviDQstGW0LTQv9GA0LDQstC70LXQvdC90Y86ICAwMTIzNDU2Nzg5MTIzZAIFDw8WAh8CBQrQn9C%2B0YjRg9C6ZGQCCQ9kFgJmD2QWAgIBDw8WAh8CBT%2FQl9Cw0YfQtdC60LDQudGC0LUsINCS0LDRiCDQt9Cw0L%2FQuNGCINC%2B0LHRgNC%2B0LHQu9GP0ZTRgtGM0YHRjyFkZAILDxYCHwMFmwLQhtC90YTQvtGA0LzQsNGG0ZbRjyDQv9GA0L4g0L3QsNGP0LLQvdGW0YHRgtGMINGC0LAg0YHRgtCw0L0g0L%2FQtdGA0LXRgdC40LvQsNC90L3RjyAg0L%2FQvtGI0YLQvtCy0LjRhSDQstGW0LTQv9GA0LDQstC70LXQvdGMINC%2F0L7RgdGC0ZbQudC90L4g0L7QvdC%2B0LLQu9GO0ZTRgtGM0YHRjyDQuSDQt9Cx0LXRgNGW0LPQsNGU0YLRjNGB0Y8g0LIg0YHQuNGB0YLQtdC80ZYg0L%2FRgNC%2B0YLRj9Cz0L7QvCA2INC80ZbRgdGP0YbRltCyINC3INC80L7QvNC10L3RgtGDINGA0LXRlNGB0YLRgNCw0YbRltGXZGTCkbz1y7PQThxiRimSt4almYGvlQ%3D%3D&ctl00%24centerContent%24txtBarcode=$id&__ASYNCPOST=true&ctl00%24centerContent%24btnFindBarcodeInfo=%D0%9F%D0%BE%D1%88%D1%83%D0%BA";
+		$a= $http->http_request(array('url'=>$url,'return'=>'array', 'cookie'=>true));
+		$cookie = $a['headers']['SET-COOKIE'];
+		$url="http://services.ukrposhta.com/barcodesingle/DownloadInfo.aspx";
+		$data= $http->http_request(array('url'=>$url, 'cookie'=>$cookie));
+		
+		$page=split("\n",$data);
+		$print=0;
+		foreach($page as $line){
+			if($print){
+				$result=strip_tags($line)."\n";
+				$print=0;
+			}
+			if(strstr("$line","divInfo")){
+				if(strstr("$line","</div>")){
+					$result= strip_tags($line)."\n";
+				}else{
+					$print=1;
+				}
+			}
+		}
+		if(strstr($result,"вручене за довіреністю")){
+			return date("Y-m-d",strtotime(mb_substr(strstr($result,"вручене за довіреністю "),23,10,'UTF-8')));
+		}else{
+			return 0;
+		}
+	}	
+	public function actionTrackMail($id){
+		$date=$this->trackMail($id);
+		echo $date;
+	}	
+
 	public function actionSent($id)
 	{
 		$model=$this->loadModel($id);
-		$model->makeRequest('gibdd');
+		if(isset($_POST['when'])){
+			if(strlen($_POST['when'])>0){
+				$date= $_POST['when'];
+				if($_POST['mailtype']==1){
+					$hrs = new HoleRequestSent;
+					$hrs->hole_id=$id;
+					$hrs->status=1;
+					$hrs->ddate=$date;
+					$hrs->save();
+				}else{
+					$hrs = new HoleRequestSent;
+					$hrs->status=2;
+					$hrs->hole_id=$id;
+					$hrs->save();
+				}
+				$date= strtotime($date);
+				$model->makeRequest('gibdd',$date);
+			}else{
+				//do nothing
+			}
+		}elseif(strlen($_POST['when2'])>0){
+			$date= strtotime($_POST['when2']);
+			$model->makeRequest('gibdd',$date);
+		}else{
+			//do nothing
+		}
 
-			
 		if(isset($_POST['holesent'])){
 			$data=$_POST['holesent'];
 			$data['hole']=$id;
@@ -681,9 +751,19 @@ class HolesController extends Controller
 					$data['user']=Yii::app()->user->id;
 				}
 			}
-			$a= var_export($data, true)."\n";
-			file_put_contents(Yii::getPathOfAlias('webroot')."/upload/logs/rcpt.log",$a,FILE_APPEND);
-
+			$hrs = new HoleRequestSent;
+			$hrs->user_id=$data['user'];
+			$hrs->rcpt=$data['rcpt'];
+			$hrs->mailme=$data['mailme'];
+			$hrs->hole_id=$data['hole'];
+			$date=$this->trackMail($data['rcpt']);
+			if($date){
+				$hrs->status=1;
+				$hrs->ddate=$date;
+			}else{
+				$hrs->status=0;
+			}
+			$hrs->save();
 		}
 			if(!isset($_GET['ajax']))
 				$this->redirect(array('view','id'=>$model->ID));
@@ -726,6 +806,8 @@ class HolesController extends Controller
 	{
 		$model=$this->loadModel($id);
 		$model->updateRevoke();
+		$hrs = HoleRequestSent::model()->find("hole_id=:id",array(":id"=>$id));
+		$hrs->delete();
 			if(!isset($_GET['ajax']))
 				$this->redirect(array('view','id'=>$model->ID));
 	}	

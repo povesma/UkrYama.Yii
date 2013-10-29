@@ -1,26 +1,31 @@
 <div id="holesent" name="holesent" style="display:none">
-<div>Это форма бла-бла-бла разъяснение</div>
 <table>
-	<tr><td>Каким письмом было отправлено?</td><td></tr>
+	<tr><td>Яким чином доставлена скарга?</td><td></tr>
 <tr><td>
-	<?= CHtml::link('Занес лично', array('sent', 'id'=>$hole->ID),array('class'=>"declarationBtn")) ?><br>
-	<?= CHtml::link('Простым', array('sent', 'id'=>$hole->ID),array('class'=>"declarationBtn")) ?><br>
-	<?= CHtml::link('Заказным', "#",array('class'=>"declarationBtn",'onClick'=>'rcptform.style["display"]="inline";')) ?>
+	<?= CHtml::link('Заніс особисто', "javascript:void(0)",array('class'=>"declarationBtn",'onClick'=>'btnz = $(".declarationBtn"); for(i=0;i<btnz.length;i++){ btnz[i].style["font-weight"]="";};this.style["font-weight"]="bold";mailtype.value="1";subwd.style["display"]="inline";wd.style["display"]="inline";rcptform.style["display"]="none"')) ?><br>
+	<?= CHtml::link('Простим листом', "javascript:void(0)",array('class'=>"declarationBtn",'onClick'=>'btnz = $(".declarationBtn"); for(i=0;i<btnz.length;i++){ btnz[i].style["font-weight"]="";};this.style["font-weight"]="bold";mailtype.value="2";subwd.style["display"]="inline";wd.style["display"]="inline";rcptform.style["display"]="none"')) ?><br>
+	<?= CHtml::link('Рекомендованим листом', "javascript:void(0)",array('class'=>"declarationBtn",'onClick'=>'btnz = $(".declarationBtn"); for(i=0;i<btnz.length;i++){ btnz[i].style["font-weight"]="";};this.style["font-weight"]="bold";subwd.style["display"]="none";wd.style["display"]="inline";rcptform.style["display"]="inline";')) ?>
 </td>
+	<form name="simple" action="/holes/sent/<?=$hole->ID?>/" method="POST" onSubmit="if(when.value.length<8){ $('#when').effect('highlight', {}, 3000); when.focus(); return false;}">
+	<input type="hidden" name="mailtype" id="mailtype">
+	<tr><td><div style="display:none" id="wd" name="wd">Коли:<br><input type="date" max="<?= date('Y-m-d',time()) ?>" name="when" id="when"><br><input id="subwd" name="subwd" type="submit" value="OК"></div></td></tr>
+	</form>
 </tr>
 	<tr>
-<td><div style="display:none" name="rcptform" id="rcptform">Пример чека<br><a target="_blank" href="/images/rcpt.png" ><img width=100px src="/images/rcpt.png"></a><br>
-	<form method="POST" action="/holes/sent/<?=$hole->ID?>">
-	Введите номер чека:<input type="number" name="holesent[rcpt]" id="rcpt"><br> 
-	<input type="checkbox" onChange="if(this.checked){nomail.style['display']='inline'}else{nomail.style['display']='none'}" name="holesent[mailme]" id="mailme"> уведомить о доставке по эл. почте.<br>
-	<div id="nomail" style="display:none">
+<td><div style="display:none" name="rcptform" id="rcptform">
+	<form method="POST" action="/holes/sent/<?=$hole->ID?>" onSubmit="if(rcpt.value.length<13){ $('#rcpt').effect('highlight', {}, 3000); rcpt.focus(); return false;}else if(when.value.length<8){ $('#when').effect('highlight', {}, 3000); when.focus(); return false;}else{when2.value=when.value;}">
+	Уведiть штрих-кодовий iдентифiкатор(ШКI):<input type="text" onkeyup="this.value=this.value.replace(/[^\d]/,'')" name="holesent[rcpt]" id="rcpt"><br>
+	Приклад штрих-кодового iдентифiкатору<br><a target="_blank" href="/images/rcpt.jpg" ><img width=150px src="/images/rcpt.jpg"></a><br>
+	<input name="when2" id="when2" type="hidden"><br/>
+	<input type="checkbox" checked onChange="if(this.checked){nomail.style['display']='inline'}else{nomail.style['display']='none'}" name="holesent[mailme]" id="mailme"> повiдомити про доставку по ел. почтi.<br>
+	<div id="nomail">
 <?php
 	if(!strlen(Yii::app()->user->email)){
-		echo "Введите ваш email <input name='nomail'>";
+		echo "Уведiть ваш email <input name='nomail'>";
 	}
 ?>
 	</div>
-	<input type="submit" value="Отправить"></div>
+	<input type="submit" value="ОК"></div>
 	</form>
 </td></tr>
 

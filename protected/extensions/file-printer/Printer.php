@@ -8,6 +8,7 @@ class Printer extends CApplicationComponent
 		$mPDF = Yii::app()->ePdf->mpdf('utf-8', 'A4', '16', 'Arial', 10, 5, 7, 7, 10, 10);
 		$mPDF->charset_in = 'utf-8';
 
+		$mPDF->showImageErrors = true;
  		$mPDF->WriteHTML($css, 1);
 		$mPDF->list_indent_first_level = 0; 
 		$mPDF->WriteHTML($html, 2);
