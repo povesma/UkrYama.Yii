@@ -42,9 +42,9 @@ class AuthorityRelation extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'authority'=>array(self::BELONGS_TO,'Authority','id1'),
+			'parent_authority'=>array(self::BELONGS_TO,'Authority','id1'),
 			'child_authority'=>array(self::BELONGS_TO,'Authority','id2'),
-			'parent'=>array(self::BELONGS_TO, 'AuthorityRelation', 'id2'),
+			'parents'=>array(self::HAS_MANY, 'AuthorityRelation', 'id1'),
 			'children'=>array(self::HAS_MANY, 'AuthorityRelation', 'id2'),
 		);
 	}

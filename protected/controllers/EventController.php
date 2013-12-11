@@ -53,6 +53,7 @@ class EventController extends Controller
 		$this->render("event", array("event"=>$event, 'tree'=>$tree));
 	}
 	public function actionGetAddress(){
+		header('Access-Control-Allow-Origin: *');
 		$lat = $_POST['lat'];
 		$lng = $_POST['lng'];
 		$uri = "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&language=uk&sensor=false";

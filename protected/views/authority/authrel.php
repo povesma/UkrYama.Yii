@@ -34,6 +34,6 @@ foreach($auth as $head){
 <?php
 foreach($model->findAll() as $arel):
 ?>
-	<tr><td><?= $arel->authority['name'] ?></td><td><?= $arel->child_authority['name'] ?></td></tr>
+	<tr><td><?= $arel->parent_authority['name'] ?></td><td><?= $arel->child_authority['name'] ?></td></tr>
 <?php endforeach; ?>
 </table>

@@ -47,92 +47,154 @@ echo $form->errorSummary($model); ?>
 	</script>
 
 	<!-- левая колоночка -->
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+<?php if($model->isNewRecord): ?>
+<script src="/js/markers.js"></script>
+<?php endif; ?>
 <script>
-var map;
 function initialize() {
+  var markers = [];
   var mapOptions = {
     zoom: 12,
-    center: new google.maps.LatLng(50.4501, 30.523400000000038),
-    mapTypeId: google.maps.MapTypeId.ROADMAP
+    center: new google.maps.LatLng(<?= $model->LATITUDE ?>,<?= $model->LONGITUDE ?>),
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    disableDoubleClickZoom: true
   };
   map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
 
-  var infowindow = new google.maps.InfoWindow();
+  // Create the search box and link it to the UI element.
+  var input = document.getElementById('target');
+  var searchBox = new google.maps.places.SearchBox(input);
 
-  marker = new google.maps.Marker({
-    map:map,
-    draggable:true,
-    animation: google.maps.Animation.DROP,
-    position: new google.maps.LatLng(50.4501, 30.523400000000038),
-    icon: "/images/cur.png"
-  });
+  // [START region_getplaces]
+  // Listen for the event fired when the user selects an item from the
+  // pick list. Retrieve the matching places for that item.
+  google.maps.event.addListener(searchBox, 'places_changed', function() {
+    var places = searchBox.getPlaces();
 
-  event = new Array();
-<?php
-	$i=0;
-	foreach($events as $event){
-		echo "event[$i] = new google.maps.Marker({map:map,draggable:false, position: new google.maps.LatLng(".$event['lat'].",".$event['lng']."),animation: google.maps.Animation.DROP});\n";
-		echo "google.maps.event.addListener(event[$i], 'click', function(){showEvent(".$event['id'].")});";
-		$i++;
+    for (var i = 0, marker; marker = markers[i]; i++) {
+      marker.setMap(null);
+    }
+
+    // For each place, get the icon, place name, and location.
+    markers = [];
+    var bounds = new google.maps.LatLngBounds();
+    for (var i = 0, place; place = places[i]; i++) {
+      var image = {
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25)
+      };
+	if(place.types[1]=="political"){
+		map.setZoom(12);
+<?php if($model->isNewRecord): ?>
+		setMarkers(map);
+<?php endif; ?>
 	}
-?>
+	if(place.types=="route"){
+		map.setZoom(14);
+<?php if($model->isNewRecord): ?>
+		setMarkers(map);
+<?php endif; ?>
+		var marker = new google.maps.Marker({
+			map: map,
+		        icon: image,
+	        	title: place.name,
+	        	position: place.geometry.location
+		});
+	      markers.push(marker);
+	}
+      bounds.extend(place.geometry.location);
+    }
+	map.setCenter(bounds.getCenter());
+  });
+  // [END region_getplaces]
 
-
-//  geo = new google.maps.Geocoder();
-
-  google.maps.event.addListener(marker, "drag", function(){
-	infowindow.close();
+  // Bias the SearchBox results towards places that are within the bounds of the
+  // current map's viewport.
+  google.maps.event.addListener(map, 'bounds_changed', function() {
+    var bounds = map.getBounds();
+    searchBox.setBounds(bounds);
   });
 
-  google.maps.event.addListener(map, "drag", function(){
-	infowindow.close();
-	marker.setPosition(map.getCenter());
-  });
-  google.maps.event.addListener(map, "dragend", function(){
-	marker.setPosition(map.getCenter());
+var defectMarker = new google.maps.Marker({
+	map: map,
+<?php if($model->isNewRecord): ?>
+	visible: false,
+<?php else: ?>
+	position: new google.maps.LatLng(<?= $model->LATITUDE ?>,<?= $model->LONGITUDE ?>),
+<?php endif; ?>
+	draggable:true,
+	icon: "/images/pmvvs.png"
+});
+
+  google.maps.event.addListener(map, 'dblclick', function(data) {
+	defectMarker.setVisible(true);
+	defectMarker.setPosition(data['latLng']);
 	updateAddress();
   });
-  google.maps.event.addListener(map, "zoom_changed", function(){
-	marker.setPosition(map.getCenter());
-	updateAddress();
-  });
-  google.maps.event.addListener(marker, "dragend", function(){
-	updateAddress();
-  });
-
+<?php if($model->isNewRecord): ?>
+  google.maps.event.addListener(map, 'idle',function(){setMarkers(map);});
+<?php endif; ?>
+  var infowindow = new google.maps.InfoWindow();
 	function updateAddress(){
 //		geo.geocode({address: "",location:marker.position, region: "uk"},function(callback){
-		$.post("/event/GetAddress",{"lat":marker.position['lat'](),"lng":marker.position['lng']()},function(data){
+		$.post("/event/GetAddress",{"lat":defectMarker.position['lat'](),"lng":defectMarker.position['lng']()},function(data){
 			var resp = JSON.parse(data);
 
-			var cord = new google.maps.LatLng(marker.position['lat']()+0.003/Math.pow(2,(map.zoom-12)), marker.position['lng']());
+			var cord = new google.maps.LatLng(defectMarker.position['lat']()+0.003/Math.pow(2,(map.zoom-12)), defectMarker.position['lng']());
 			var info = resp['results'][0].address_components;
-			var address=info[3]['long_name']+", "+info[2]['long_name']+", "+info[1]['long_name']+", "+info[0]['long_name'];
-			community.paddress.value=address;
+//			var address=info[3]['long_name']+", "+info[2]['long_name']+", "+info[1]['long_name']+", "+info[0]['long_name'];
+			var streetNumber, route, locality, sublocality, administrative_area_level_2, administrative_area_level_1;
+			for(i=0;i<info.length;i++){
+				switch(info[i]['types'][0]){
+					case "street_number":
+						streetNumber=info[i]['long_name'];
+					break;
+					case "route":
+						route=info[i]['long_name']+", ";
+					break;
+
+					case "sublocality":
+						sublocality=info[i]['long_name']+", ";
+					break;
+
+					case "locality":
+						locality=info[i]['long_name']+", ";
+					break;
+
+					case "administrative_area_level_2":
+						administrative_area_level_2=info[i]['long_name']+", ";
+					break;
+					case "administrative_area_level_1":
+						administrative_area_level_1=info[i]['long_name']+", ";
+					break;
+
+				}
+			}
+			administrative_area_level_1=(administrative_area_level_1=== undefined)?"1":administrative_area_level_1;
+			sublocality=(sublocality=== undefined)?"":sublocality;
+			route=(route=== undefined)?"":route;
+			streetNumber=(streetNumber=== undefined)?"":streetNumber;
+			address=administrative_area_level_1+sublocality+route+streetNumber;
+
+			Holes_ADDRESS.value=address;
 			infowindow.setContent(address);
 			infowindow.maxWidth=200;
 			infowindow.setPosition(cord);
 			infowindow.open(map);
 
-			var pos = marker.getPosition();
-			community.lat.value=marker.position['lat']();
-			community.lng.value=marker.position['lng']();
+//			var pos = defectMarker.getPosition();
+			Holes_LATITUDE.value=defectMarker.position['lat']();
+			Holes_LONGITUDE.value=defectMarker.position['lng']();
 		});
 	}
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
-
-function showEvent(id){
-	var params = "menubar=no,location=no,resizable=yes,scrollbars=yes,status=yes"
-	window.open("/event/ViewEvent/"+id, "Недолiк", params)
-}
-
-function addAddress(){
-	community.address.value=community.paddress.value;
-}
 </script>
 	<div class="lCol main_section">
 <?php if(!(Yii::app()->user->getId())){ ?>
@@ -162,18 +224,7 @@ function addAddress(){
 		<div class="form_top_bg clear">
 			<div class="google-search-form" style="padding-bottom: 0px;">
 				<table>
-				<tr>
-					<td><div style="width:270px"><?= Yii::t('template', 'ENTER_ADDRES_FOR_SEARCH')?></div></td>
-					<td><input type="text" id="address_inp" name="address" class="textInput" value="" style="width: 300px;" /></td>
-					<td><input type="submit" value="<?php echo Yii::t('template', 'SEARCH')?>" onclick="return false;" /></td>
-				</tr>
-				<tr>
-					<td colspan=3><button style="display:none;" id="clear_result" onclick="return false;"><?php echo Yii::t('template', 'CLEAR')?></button></td>
-				</tr>
-				<tr><td colspan=3>
-					<div class="full_adress">
-						<div class="bx-google-search-results" id="results_MAP"></div>
-					</div>
+				      <input id="target" type="text" placeholder="Поиск">
 				</td></tr>
 				</table>
 			</div>	
@@ -228,21 +279,31 @@ function addAddress(){
 		<!-- фотки -->
 		<div class="f clearfix">
 			<?php echo $form->labelEx($model,'upploadedPictures'); ?>
-			<?php $this->widget('CMultiFileUpload', array('accept'=>'gif|jpg|png', 'model'=>$model, 'attribute'=>'upploadedPictures', 'htmlOptions'=>array('class'=>'mf'), 'denied'=>Yii::t('mf','Невозможно загрузить этот файл'),'duplicate'=>Yii::t('mf','Файл уже существует'),'remove'=>Yii::t('mf','удалить'),'selected'=>Yii::t('mf','Файлы: $file'),)); ?>			
+			<?php $this->widget('CMultiFileUpload', array('accept'=>'gif|jpg|png|jpeg', 'model'=>$model, 'attribute'=>'upploadedPictures', 'htmlOptions'=>array('class'=>'mf'), 'denied'=>Yii::t('mf','Невозможно загрузить этот файл'),'duplicate'=>Yii::t('mf','Файл уже существует'),'remove'=>Yii::t('mf','удалить'),'selected'=>Yii::t('mf','Файлы: $file'),)); ?>			
 			<p class="tip">
             <?php echo Yii::t('template', 'ENTER_PHOTO_REMARK')?>	         
          </p>			
 		</div>
-		
+						<?
+				if(!$model->isNewRecord && $model->pictures_fresh && $model->STATE!=Holes::STATE_FIXED)
+				{
+					?>
+					<div id="overshadow"><span class="command" onclick="document.getElementById('picts').style.display=document.getElementById('picts').style.display=='block'?'none':'block';"><?php echo Yii::t('template', 'INFO_CANDELETEPHOTO')?></span><div class="picts" id="picts"><?
+					foreach($model->pictures_fresh as $i=>$picture){				
+						echo '<br>'.$form->checkBox($model,"deletepict[$i]", array('class'=>'filter_checkbox','value'=>$picture->id)).' ';
+						echo $form->labelEx($model,"deletepict[$i]", array('label'=>Yii::t('template', 'DELETEPICT'))).'<br><img src="'.$picture->medium.'"><br><br>';
+					}
+					echo '</div></div>';
+				} ?>
+
 		<!-- камент -->
 		<div class="f">
 			<?php echo $form->labelEx($model,'COMMENT1'); ?>
-			<?php echo $form->textArea($model,'COMMENT1'); ?>
+			<?php echo $form->textArea($model,'COMMENT1',array('height'=>"150px")); ?>
 			<?php echo $form->error($model,'COMMENT1'); ?>
 		</div>
 		<?php echo $form->hiddenField($model,'LATITUDE'); ?>
 		<?php echo $form->hiddenField($model,'LONGITUDE'); ?>
-		<?php echo $form->hiddenField($model,'STR_SUBJECTRF'); ?>
 		<?php echo $form->hiddenField($model,'ADR_CITY'); ?>
 
 		<div class="addSubmit">

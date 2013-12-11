@@ -59,7 +59,6 @@ class Authority extends CActiveRecord
 			'atype'=>array(self::BELONGS_TO, "AuthorityType", array('type','lang')),
 			'region'=>array(self::BELONGS_TO, "Region", array('region_id','lang')),
 			'children'=>array(self::HAS_MANY, "AuthorityRelation", 'id' ),
-			'parent'=>array(self::BELONGS_TO, "AuthorityRelation", 'id2' ),
 		);
 	}
 
@@ -83,7 +82,15 @@ class Authority extends CActiveRecord
 			'o_fax' => 'Fax',
 		);
 	}
-
+	public function parents($lang){
+		$parents_id=AuthorityRelation::model()->findAll('id2=:id',array(':id'=>$this->id));
+		$parents=array();
+		foreach($parents_id as $id){
+			$parent=$this->findByPk(array('id'=>$id->id1,'lang'=>$lang));
+			array_push($parents,$parent);
+		}
+		return $parents;
+	}
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.
 	 *

@@ -47,18 +47,19 @@ class Cron
 		foreach($this->todolist as $job){
 			$list[]=$job['id'];
 		}
-		 $sql ="DELETE FROM jobs WHERE id IN(".implode(", ",$list).")";
-		 Yii::app()->db->createCommand($sql)->execute();
+//		 $sql ="DELETE FROM jobs WHERE id IN(".implode(", ",$list).")";
+//		 Yii::app()->db->createCommand($sql)->execute();
 	}
 
 	private function checkTime(){
-		$command = Yii::app()->db->createCommand("SELECT datetime FROM jobs WHERE type='time'")->queryRow();
+
+//		$command = Yii::app()->db->createCommand("SELECT datetime FROM jobs WHERE type='time'")->queryRow();
 		$time = strtotime ($command['datetime']);
 		$time2 = strtotime (date("Y-m-d H:i:s"));
 		if(60*60 < ($time2-$time)) {return 1;}
 		else{
 			return 0;
-		}
+ 		}
 	}
 	private function setTime(){
 		$command = Yii::app()->db->createCommand();
@@ -87,7 +88,6 @@ class Cron
 		}
 		$sql="INSERT INTO jobs(type,datetime$vars) VALUES('$type','$datetime'$vals)";
 		$sql;
-		Yii::app()->db->createCommand($sql)->execute();
 	}
 
 }
