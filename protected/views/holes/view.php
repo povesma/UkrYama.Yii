@@ -105,7 +105,7 @@ function initialize() {
 								if($deliv->status){
 									if($deliv->status!=2){$arr[] = array('name'=>Yii::t('holes_view', 'HOLE_REQUEST_DELIVERDATE',array('{0}'=>$request->$param->name)), 'date'=>Y::dateFromTime($deliv->ddate));}
 								}else{
-									if(strlen($deliv->status)){$arr[] = array('name'=>Yii::t('holes_view', 'HOLE_REQUEST_DELIVERDATE'), 'date'=>Yii::t('holes_view', 'HOLE_REQUEST_NOTDELIVERED'));}
+									if(strlen($deliv->status)){$arr[] = array('name'=>Yii::t('holes_view', 'HOLE_REQUEST_DELIVERDATE',array('{0}'=>$request->$param->name)), 'date'=>Yii::t('holes_view', 'HOLE_REQUEST_NOTDELIVERED'));}
 								}
 
 								if($request->answers) foreach($request->answers as $answer){
