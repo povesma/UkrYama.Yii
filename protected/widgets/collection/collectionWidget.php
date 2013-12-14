@@ -1,35 +1,28 @@
 <?php
 
 class collectionWidget extends CWidget {
+        
+   public $itemview='default';
+   
+   public function init() {
+      $this->registerCoreScripts();
+      parent::init();
+   }
 
-        public $itemview='default';
+   protected function registerCoreScripts() {
+      //$cs=Yii::app()->getClientScript();
+      //$cs->registerCoreScript('jquery');
+   }
 
-      
-        public function init() {
-            $this->registerCoreScripts();
-            parent::init();
-        }
-
-
-        protected function registerCoreScripts() {
-            $cs=Yii::app()->getClientScript();
-            $cs->registerCoreScript('jquery');
-        }
-
-
-
-        public function run() {
-        $model=Holes::model()->count(Array('condition'=>'PREMODERATED=1'));
-        $all=$model;
-        $model=Holes::model()->count(Array('condition'=>'PREMODERATED=1 AND STATE="inprogress"'));
-        $ingibdd=$model;
-        $model=Holes::model()->count(Array('condition'=>'PREMODERATED=1 AND STATE="fixed"'));
-        $fixed=$model;
-            $this->registerCoreScripts();
-                $this->render($this->itemview, Array(
-                'all'=>$all, //Y::declOfNum($all, array('дефект', 'дефекта', 'дефектов')),
-				'ingibdd'=>$ingibdd,
-				'fixed'=>$fixed,
-                ));
-        }
+   public function run() {
+      $all = Holes::model()->count(array('condition'=>'PREMODERATED=1'));
+      $ingibdd = Holes::model()->count(array('condition'=>'PREMODERATED=1 AND STATE="inprogress"'));
+      $fixed = Holes::model()->count(array('condition'=>'PREMODERATED=1 AND STATE="fixed"'));
+      $this->registerCoreScripts();
+      $this->render($this->itemview, Array(
+         'all'=>$all,
+         'ingibdd'=>$ingibdd,
+         'fixed'=>$fixed,
+      ));
+   }
 }

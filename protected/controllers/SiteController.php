@@ -20,6 +20,8 @@ class SiteController extends Controller
 			'page'=>array(
 				'class'=>'CViewAction',
 			),
+			'kyiv'=>array('class'=>'CViewAction', 'defaultView'=> 'kyiv'),
+			'payment'=>array('class'=>'CViewAction', 'defaultView'=> 'poll01'),
 		);
 	}
 
@@ -134,13 +136,12 @@ class SiteController extends Controller
 	}
 
     public function actionChangeLang(){
-        if (Yii::app()->user->isGuest){
-            echo false;
-        } else{
-            $lang = Yii::app()->request->getParam("lang");
-             Yii::app()->user->setLanguage($lang);
-            echo Yii::app()->user->language;
-        }
-
-    }
+      if (Yii::app()->user->isGuest){
+         echo false;
+      }else{
+         $lang = Yii::app()->request->getParam("lang");
+         Yii::app()->user->setLanguage($lang);
+         echo Yii::app()->user->language;
+      }
+   }
 }

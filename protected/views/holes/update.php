@@ -1,4 +1,4 @@
 <?
-$this->pageTitle=Yii::app()->name . ' :: Изменить дефект';
+$this->pageTitle=Yii::app()->name.' :: '.Yii::t('template', 'EDIT_DEFECT');
 ?>
-<?php echo $this->renderPartial('_form', array('model'=>$model, 'newimage'=>new PictureFiles)); ?>
+<?php echo $this->renderPartial('holeform', array('model'=>$model, 'newimage'=>new PictureFiles)); ?>

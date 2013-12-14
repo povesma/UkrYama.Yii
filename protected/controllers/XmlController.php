@@ -517,7 +517,7 @@ class XmlController extends Controller
 			case 'pdf_gibdd':
 			{
 				$attribs=Array(				
-				'to'=>Yii::app()->request->getParam('to'),
+				'to_name'=>Yii::app()->request->getParam('to'),
 				'from'=>Yii::app()->request->getParam('from'),
 				'postaddress'=>Yii::app()->request->getParam('postaddress'),
 				'address'=>Yii::app()->request->getParam('holeaddress') ? Yii::app()->request->getParam('holeaddress') : $model->ADDRESS,

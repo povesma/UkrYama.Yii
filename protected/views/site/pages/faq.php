@@ -1,6 +1,5 @@
 <?
 $this->pageTitle=Yii::app()->name . ' - FAQ';
-//$this->layout='//layouts/header_default_without_add';
 $this->layout='//layouts/header_blank';
 ?>
 <div class="lCol">
@@ -66,7 +65,7 @@ $this->layout='//layouts/header_blank';
 	<table class="faq-item">
 		<tr>
 			<th>Q:</th>
-			<td class="question"Как это работает?</td>
+			<td class="question">Как это работает?</td>
 		</tr>		
 		<tr>
 			<th>A:</th>

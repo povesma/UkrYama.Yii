@@ -27,7 +27,8 @@ div#ymapcontainer_big_map { height: 600px; width: 960px; }
 div.rCol .h p { margin-bottom:0.31em }
 div.rCol .h .date { color: #637280; font-size: 12px; margin:3px 0 10px; display: inline-block;}
 div.rCol .h .type { font-size: 18px; padding: 0 0 0 32px; background-repeat: no-repeat; color:#000; background-position: left; height: 22px; line-height: 22px; margin-bottom:11px; }
-div.rCol .h .address { background: url(../images/marker.png) no-repeat 2px center; padding-left: 19px;}
+/*div.rCol .h*/ 
+.address { background: url(../images/marker.png) no-repeat 2px center; padding-left: 19px;}
 
 div.rCol .h .type_crossing { background-image: url("../images/st1234/crossing.png"); }
 div.rCol .h .type_badroad { background-image: url("../images/st1234/badroad.png"); }
@@ -142,7 +143,7 @@ div.rCol .h .edit-container {
     width: 160px;
 }
 
-.edit-container a + a {
+.edit-container .delete{
     color: #db0000;
     position: relative;
     padding: 0 0 0 12px;
@@ -171,7 +172,7 @@ div.rCol .after h2 {
 	padding-top: 1.5em;
 }
 
-div.rCol .after .comment {
+div.rCol .after .form-comment {
 	/*border-top: 1px solid #fff;
 	float: left;
 	left: -240px;
@@ -205,49 +206,54 @@ div.rCol .after .comment {
 	border-radius: 20px;
 	-moz-border-radius: 20px;
 	-webkit-border-radius: 20px;
-	left: -10px;
-	padding: 20px 70px;
-	position: absolute;
-	width: 660px;
+	margin-left: -200px;
+	padding: 20px 20px;
+	position: fixed;
+	width: 800px;
+	top:0px;
 	z-index: 999;
 	box-shadow:0 0 15px 0 rgba(0,0,0, .09);
 	-moz-box-shadow:0 0 15px 0 rgba(0,0,0, .09);
 	-webkit-box-shadow:0 0 15px 0 rgba(0,0,0, .09);
+	overflow:scroll;
+	height:100%;
 }
 .pdf_form .close, .pdf_form .close:hover {
 	position: absolute; 
-	right: 20px; 
-	top: 20px; 
-	text-decoration: none; 
+	right: 20px;
+	top: 20px;
+	text-decoration: none;
 	width:20px;
 	height:20px;
 	background: url(../images/close-ico.png) 0 0 no-repeat;
 	text-indent: -9999px;
 }
 .pdf_form label{
-	font-size: 16px;
-    font-weight: normal;
+	font-size: 14px;
+	font-weight: bold;
 }
 .pdf_form .close:hover { color: #e6670f }
 .pdf_form h2 { font-size: 1.8em; font-weight: normal; text-align: center; }
 .pdf_form a { background-color: transparent; color: #333; }
-.pdf_form th, .pdf_form td { padding: 0 0 20px; text-align: left; vertical-align: top; }
-.pdf_form th { font-weight: bold; width: 44%;}
-.pdf_form td { text-align: right;}
-.pdf_form input, .pdf_form textarea { width: 92% }
+.pdf_form th, .pdf_form td { padding: 0 0 10px; text-align: left; vertical-align: top; }
+.pdf_form th { font-weight: bold; width: 100px;}
+.pdf_form td { text-align: right; padding-right:40px;}
+.pdf_form input, .pdf_form textarea { width: 380px; }
 .pdf_form .textInput, .pdf_form textarea  { border:1px solid #9aa3ab; }
 .pdf_form .textInput{
 	height:23px;
 	line-height: 23px;
-	padding:0 5px;
-	width:480px;
+	width:380px;
 }
 .pdf_form textarea{
 	padding:5px;
-	width:480px;
+	width:370px;
+	height:35px;
 }
 .pdf_form td .submit { width: auto }
-.pdf_form table span.comment { 
+.pdf_form td .lnbtn { width: auto }
+.pdf_form td .selbt { color:yellow; }
+.pdf_form table span.form-comment { 
 	display: block;
 	color: #637280;
 	font-size: 12px;
@@ -255,7 +261,33 @@ div.rCol .after .comment {
 	line-height: 1.17em;
 	margin-top: 3px;
 }
+.form_pics{
+	display: none;
+}
 
+.form_pics ul{
+	display: inline;
+}
+.form_pics li{
+	list-style: none;
+	display: inline;
+}
+.form_pics input[type="checkbox"]{
+	display:none;
+}
+.form_pics a{
+	position:relative;
+}
+
+.form_pics .t_pic{
+	z-index:1;
+}
+.form_pics .tic{
+	position:absolute;
+	z-index:2;
+	top:-12px;
+	right:4px;
+}
 div.rCol .before:after, div.rCol .after:after {
 	content: ".";
 	display: block;
@@ -294,14 +326,15 @@ div.rCol .before:after, div.rCol .after:after {
 }
 
 .holes_pict img{
-	margin: 0 20px 20px 0;
-    width: 215px;
+	margin: 0 20px 0 0;
+	width: 215px;
 }
 
-a.holes_pict:active { background: none; }
-a.holes_pict {
+.holes_pict a:active { background: none; }
+.holes_pict_p {
     position: relative;
     float: left;
+	margin: 0 20px 0 0;
 }
 
 span.zoom-pic {

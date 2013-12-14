@@ -48,6 +48,11 @@ class UserController extends Controller
 				'expression'=>'UserGroupsConfiguration::findRule("registration")',
 				'users'=>array('?'),
 			),
+			array('allow',
+				'actions'=>array('autoregister'),
+				'ajax'=>true,
+				'users'=>array('?'),
+			),
 			array('allow',  // actions users can access while in recovery mode
 				'actions'=>array('recovery','logout'),
 				'users'=>array('#'),
@@ -246,6 +251,32 @@ class UserController extends Controller
 		));
 	}
 
+	private function randomPassword() {
+	    $alphabet = "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
+	    for ($i = 0; $i < 8; $i++) {
+	        $n = rand(0, count($alphabet)-1);
+        	$pass[$i] = $alphabet[$n];
+	    }
+	    return $pass;
+	}
+
+	public function actionAutoRegister(){
+		$newUser = $_POST['CommunityForm'];
+		$umod = new UserGroupsUser;
+		$users = $umod->findAllByAttributes(array(),"email=:email",array(":email"=>$newUser['email']));
+		if(count($users)==0){
+			$model=new UserGroupsUser('autoregistration');
+			$model->username=$newUser['email'];
+			$model->name=$newUser['firstName'];
+			$model->last_name=$newUser['lastName'];
+			$model->email=$newUser['email'];
+			$model->password=$this->randomPassword();
+			if($model->save()){echo $model->primaryKey;}
+		}else{
+			echo $users[0]->id;
+		}
+
+	}
 	/**
 	 * user invite form
 	 */
@@ -530,30 +561,6 @@ class UserController extends Controller
 	{
 	
 		$service = Yii::app()->request->getQuery('service');
-		/*if (isset($service)) {
-			$authIdentity = Yii::app()->eauth->getIdentity($service);
-			$authIdentity->redirectUrl = Yii::app()->user->returnUrl;
-			$authIdentity->cancelUrl = $this->createAbsoluteUrl('site/login');
-			
-			if ($authIdentity->authenticate()) {
-				$identity = new ServiceUserIdentity($authIdentity);
-				
-				// успешная авторизация
-				if ($identity->authenticate()) {
-					Yii::app()->user->login($identity);
-					
-					// специальное перенаправления для корректного закрытия всплывающего окна
-					$authIdentity->redirect();
-				}
-				else {
-					// закрытие всплывающего окна и перенаправление на cancelUrl
-					$authIdentity->cancel();
-				}
-			}
-			
-			// авторизация не удалась, перенаправляем на страницу входа
-			$this->redirect(array('site/login'));
-		}*/
 		
 		if (isset($service)) {
 			$authIdentity = Yii::app()->eauth->getIdentity($service);

@@ -54,7 +54,7 @@ class PictureFiles extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'files' => 'Нужно загрузить фотографии',
+			'files' => Yii::t('template', 'INFO_UPLOADPICT'),
 
 		);
 	}

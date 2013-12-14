@@ -1,9 +1,8 @@
 <?php
-    $this->pageTitle=Yii::app()->name . ' :: Помощь проекту';
-    $this->layout='//layouts/header_blank';
+$this->title = Yii::t("template", "MENU_TOP_DONATE");
+$this->pageTitle = Yii::app()->name . ' :: '.$this->title;
+$this->layout='//layouts/header_blank';
 ?>
-
- <h2>Помощь проекту</h2>
  		
   <ul class="default"> 			Друзья, если вы хотите помочь проекту &laquo;УкрЯма&raquo;, то: 	
     <br />

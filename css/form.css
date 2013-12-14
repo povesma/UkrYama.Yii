@@ -112,7 +112,7 @@ div.form label
 {
 	font-weight: normal;
 	font-size: 1.1em;
-	display: block;
+/*	display: block; */
 	text-align: right;
 }
 
@@ -146,11 +146,13 @@ div.form #user-groups-passrequest-form label{
 	position: relative;
 	display: inline;
 }
+/*
 div.form table span.required{
 	position: absolute;
 	left:-10px;
 	top:0px;
 }
+*/
 
 div.form div.error label,
 div.form label.error,

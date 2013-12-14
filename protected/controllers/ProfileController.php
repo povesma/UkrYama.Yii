@@ -167,7 +167,7 @@ class ProfileController extends Controller
 	public function actionSaveHoles2Selected($id, $holes)
 	{
 		if ($id){
-			$gibdd=GibddHeads::model()->findByPk((int)$id);
+			$gibdd=GibddHeads_ua::model()->findByPk((int)$id);
 			$holemodel=Holes::model()->findAllByPk(explode(',',$holes));
 			if ($gibdd && $holemodel) {
 				$model=new UserSelectedLists;

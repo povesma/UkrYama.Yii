@@ -38,7 +38,7 @@ class HoleRequests extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('hole_id, user_id, gibdd_id, date_sent, type', 'required'),
+			array('hole_id, user_id, gibdd_id, date_sent, ref', 'required'),
 			array('hole_id, user_id, gibdd_id, date_sent', 'numerical', 'integerOnly'=>true),
 			array('type', 'length', 'max'=>30),
 			// The following rule is used by search().
@@ -59,6 +59,9 @@ class HoleRequests extends CActiveRecord
 			'answers'=>array(self::HAS_MANY, 'HoleAnswers', 'request_id','order'=>'date DESC'),
 			'hole'=>array(self::BELONGS_TO, 'Holes', 'hole_id'),
 			'user'=>array(self::BELONGS_TO, 'UserGroupsUser', 'user_id'),
+			'auth_ru'=>array(self::BELONGS_TO,'Authority','gibdd_id','condition'=>'lang="ru"'),
+			'auth_ua'=>array(self::BELONGS_TO,'Authority','gibdd_id','condition'=>'lang="ua"'),
+			'req_sent'=>array(self::HAS_ONE, 'HoleRequestSent', 'req'),
 		);
 	}
 	
@@ -84,6 +87,7 @@ class HoleRequests extends CActiveRecord
 	}
 	
 	public function afterDelete(){
+/*
 		if (!count ($this->findAll('hole_id='.$this->hole_id.' AND type="'.$this->type.'"'))){
 			if ($this->type=='gibdd') {
 				$this->hole->STATE='inprogress';				
@@ -94,7 +98,8 @@ class HoleRequests extends CActiveRecord
 				$this->hole->DATE_SENT_PROSECUTOR=null;
 				$this->hole->update();
 			}			
-		}	
+		}
+*/
 		return true;	
 	}		
 

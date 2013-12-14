@@ -1,22 +1,15 @@
 <?php $this->beginContent('//layouts/main'); ?>
 <div class="head">
-		<div class="container">
-			<div class="lCol">
-				<a href="/" class="logo" title="На главную"><img src="<?php echo Yii::app()->request->baseUrl; ?>/images/logo.png"  alt="УкрЯма" /></a>
-			</div>
-			<h1><?php echo $this->title; ?></h1>
-		</div>
+   <div class="container">
+      <div class="lCol">
+         <?php echo CHtml::link(CHtml::image(Yii::app()->request->baseUrl."/images/logo.png", $this->pageTitle), "/", array('class'=>'logo', 'title'=>Yii::t('template','GOTO_MAIN'))); ?>
+      </div>
+      <h1><?php echo $this->title; ?></h1>
+   </div>
 </div>
-<br clear="all">
-	
-
-	<div class="mainCols">
-		<?php /* if(isset($this->breadcrumbs)):?>
-		<?php $this->widget('zii.widgets.CBreadcrumbs', array(
-			'links'=>$this->breadcrumbs,
-		)); ?><!-- breadcrumbs -->
-	<?php endif; */ ?>
-	<?php echo $content; ?>
-	</div>		
-	
+<a href="http://stfalcon.github.io/euromaidan/" class="em-ribbon" style="position: absolute; left:0; top:0; width: 90px; height: 90px; background: url('http://stfalcon.github.io/euromaidan/img/em-ribbon.png'); z-index: 2013; border: 0;" title="Розмісти стрічку з символікою України і ЄС на своєму сайті!" target="_blank"></a>
+<!--<br clear="all" />-->
+<div class="mainCols">
+	<?php echo $content; ?>	
+</div>
 <?php $this->endContent(); ?>

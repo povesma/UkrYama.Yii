@@ -58,7 +58,7 @@ class Controller extends CController
     public function getMapkey()
     {
         return Yii::app()->params['YMapKey'];
-    }
+    } 
 
 
     protected function beforeAction($action)
