@@ -2,10 +2,7 @@
 
 class XmlController extends Controller
 {
-	/**
-	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
-	 * using two-column layout. See 'protected/views/layouts/column2.php'.
-	 */
+
 	public $layout=false;
 
 	/**
@@ -316,7 +313,7 @@ class XmlController extends Controller
 		$model->COMMENT1=$comment;
 		if (!$gibdd_id){
 			$subjmodel=RfSubjects::model()->findByPk($subject_rf);
-			if ($subjmodel) $model->gibdd_id=$subjmodel->gibdd->id;
+			if ($subjmodel) $model->gibdd_id=$subjmodel->gibdd_ru->id;
 			else $model->gibdd_id=0;
 			}
 		else $model->gibdd_id=$gibdd_id;
