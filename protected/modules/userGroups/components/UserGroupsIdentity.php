@@ -75,7 +75,7 @@ class UserGroupsIdentity extends CUserIdentity
 	 * @return boolean whether authentication succeeds.
 	 */
 	public function authenticate()
-	{
+	{		
 		$model=UserGroupsUser::model()->findByAttributes(array('username' => $this->username));
 		
 		//Тупая битриксовская проверка пароля.

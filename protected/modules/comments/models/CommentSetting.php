@@ -28,7 +28,7 @@ class CommentSetting extends CActiveRecord {
     }
 
     public function tableName() {
-        return 'comment_setting';
+        return '{{comment_setting}}';
     }
 
     public function rules() {

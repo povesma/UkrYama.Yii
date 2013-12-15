@@ -9,6 +9,8 @@
     <br />
    		«<a href="http://pravoved.in.ua/" target="_blank" >Правовед</a>» — правовая литература Украины. Знай свои права и обязанности;
     <br />
+   		«<a href="http://soter.kiev.ua/" target="_blank" >Юридична компанія "Сотер"</a>» — індивідуальна правова допомога, захист в судах, реєстрація фірм;
+    <br />
    		«<a href="http://ogo.in.ua/" target="_blank" >ОГО</a>» — домашний интернет; 		«<a href="http://ISP.ogo.in.ua/" target="_blank" >ISP.ogo.in.ua</a>» — каталог интернет провайдеров Украины;
     <br />
    		«<a href="http://ahelp.ua/" target="_blank" >Авто-айленд</a>» — самый полезный автомобильный портал. Проверка автомобиля по <a href="http://ahelp.ua/inspection.html" target="_blank" >VIN-коду</a>;

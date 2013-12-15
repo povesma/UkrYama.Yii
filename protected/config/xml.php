@@ -18,32 +18,32 @@ return array(
 
 	// autoloading model and component classes
 	'import'=>array(
-		'application.models.*',
-		'application.components.*',
-		'application.classes.*',
-		'application.modules.userGroups.*',
-		'application.modules.userGroups.models.*',
-        'application.modules.userGroups.components.*',
-		'application.extensions.nestedset.*',
-		'application.extensions.fpdf.*',
-		'application.extensions.*',
-		'application.helpers.*',
-	    'ext.eoauth.*',
-		'ext.eoauth.lib.*',
-		'ext.lightopenid.*',
-		'ext.eauth.services.*',
-			),
-	'modules'=>array(		
-					
-			'userGroups'=>array(
-				'accessCode'=>'12345',
-				'salt'=>'111',				
-				'profile'=>Array('Profile')
-			),
-    'comments'=>array(
-      //you may override default config for all connecting models
-      'defaultModelConfig' => array(
-          //only registered users can post comments
+      'application.models.*',
+      'application.components.*',
+      'application.classes.*',
+      'application.modules.userGroups.*',
+      'application.modules.userGroups.models.*',
+      'application.modules.userGroups.components.*',
+      'application.extensions.nestedset.*',
+      'application.extensions.fpdf.*',
+      'application.extensions.*',
+      'application.modules.comments.models.*',
+      'application.helpers.*',
+      'ext.eoauth.*',
+      'ext.eoauth.lib.*',
+      'ext.lightopenid.*',
+      'ext.eauth.services.*',
+   ),
+	'modules'=>array(							
+		'userGroups'=>array(
+			'accessCode'=>'12345',
+			'salt'=>'111',				
+			'profile'=>Array('Profile')
+		),
+		'comments'=>array(
+			//you may override default config for all connecting models
+			'defaultModelConfig' => array(
+      		//only registered users can post comments
             'registeredOnly' => true,
             'useCaptcha' => false,
             //allow comment tree
@@ -79,8 +79,8 @@ return array(
       		'nameProperty'=>'fullname',
       		//'emailProperty'=>'email',
       	),
-      ),      
-    ),
+      ),
+   ),
 	// application components
 	'components'=>array(
 		'user'=>array(

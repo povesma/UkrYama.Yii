@@ -125,7 +125,6 @@
 				 },
 				 "complete":function(){
 					$("#pdf_form").show();
-					$("#pdf_form").focus();
 					},"url":$(this).attr("href"),"cache":false,
 				"success":function(html){
 					jQuery("#gibdd_form").html(html);

@@ -519,17 +519,6 @@ class UserGroupsUser extends CActiveRecord
 				else
 					$this->status = self::ACTIVE;
 			}
-			if ($this->scenario === 'autoregistration') {
-				$this->group_id = UserGroupsConfiguration::findRule('user_registration_group');
-				if (UserGroupsConfiguration::findRule('user_need_activation')) {
-					$this->status = self::WAITING_ACTIVATION;
-					$this->activation_code = uniqid();
-					$this->activation_time = date('Y-m-d H:i:s');
-				} else if (UserGroupsConfiguration::findRule('user_need_approval'))
-					$this->status = self::WAITING_APPROVAL;
-				else
-					$this->status = self::ACTIVE;
-			}
 			// erese the activation code for security reasons
 			if ((int)$this->status !== self::WAITING_ACTIVATION && (int)$this->status !== self::WAITING_APPROVAL && (int)$this->status !== self::PASSWORD_CHANGE_REQUEST && $this->scenario !== 'passRequest')
 				$this->activation_code = NULL;
@@ -545,13 +534,8 @@ class UserGroupsUser extends CActiveRecord
 	{
 		parent::afterSave();
 		// send the needed emails for account activation
-		if (($this->scenario === 'admin' || $this->scenario === 'registration') && $this->status === self::WAITING_ACTIVATION) 			{
+		if (($this->scenario === 'admin' || $this->scenario === 'registration') && $this->status === self::WAITING_ACTIVATION) {
 			$mail = new UGMail($this, UGMail::ACTIVATION);
-			$mail->send();
-		}
-
-		if (($this->scenario === 'autoregistration' ) && $this->status === self::WAITING_ACTIVATION) {
-			$mail = new UGMail($this, UGMail::INVITATION);
 			$mail->send();
 		}
 

@@ -561,6 +561,30 @@ class UserController extends Controller
 	{
 	
 		$service = Yii::app()->request->getQuery('service');
+		/*if (isset($service)) {
+			$authIdentity = Yii::app()->eauth->getIdentity($service);
+			$authIdentity->redirectUrl = Yii::app()->user->returnUrl;
+			$authIdentity->cancelUrl = $this->createAbsoluteUrl('site/login');
+			
+			if ($authIdentity->authenticate()) {
+				$identity = new ServiceUserIdentity($authIdentity);
+				
+				// успешная авторизация
+				if ($identity->authenticate()) {
+					Yii::app()->user->login($identity);
+					
+					// специальное перенаправления для корректного закрытия всплывающего окна
+					$authIdentity->redirect();
+				}
+				else {
+					// закрытие всплывающего окна и перенаправление на cancelUrl
+					$authIdentity->cancel();
+				}
+			}
+			
+			// авторизация не удалась, перенаправляем на страницу входа
+			$this->redirect(array('site/login'));
+		}*/
 		
 		if (isset($service)) {
 			$authIdentity = Yii::app()->eauth->getIdentity($service);

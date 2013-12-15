@@ -70,7 +70,7 @@ EOD
 	<!-- /правая колоночка -->
 	<div class="addSubmit">
 		<div class="container">
-			<div onclick="$(this).parents('form').submit();">
+			<div class="btn" onclick="$(this).parents('form').submit();">
 				<a class="addFact"><i class="text"><?php echo Yii::t('template', 'SEND')?></i><i class="arrow"></i></a>
 			</div>
 		</div>

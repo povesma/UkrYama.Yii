@@ -280,6 +280,7 @@ class XmlController extends Controller
 			}
 		
 		$addressArr    = RfSubjects::model()->Address($address);
+//		echo $addressArr['subject_rf'].":".$addressArr['city'].":".$addressArr['address']; exit;
 		$subject_rf = $addressArr['subject_rf'];
 		$city       = $addressArr['city'];
 		$address    = $addressArr['address'];
@@ -517,7 +518,7 @@ class XmlController extends Controller
 			case 'pdf_gibdd':
 			{
 				$attribs=Array(				
-				'to_name'=>Yii::app()->request->getParam('to'),
+				'to'=>Yii::app()->request->getParam('to'),
 				'from'=>Yii::app()->request->getParam('from'),
 				'postaddress'=>Yii::app()->request->getParam('postaddress'),
 				'address'=>Yii::app()->request->getParam('holeaddress') ? Yii::app()->request->getParam('holeaddress') : $model->ADDRESS,
