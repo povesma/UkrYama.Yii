@@ -111,7 +111,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->clientScript->getCoreScrip
 		    </div>
 		<?php else: ?>
          <?php echo CHtml::link(Yii::t("template", "LOGIN"),Array('/holes/personal'),Array('title'=>Yii::t("template", "LOGOUT"), 'class'=>'profileBtn')); ?>
-		<? endif; ?>
+		<?php endif; ?>
 			
          
       <style type="text/css">
@@ -221,7 +221,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->clientScript->getCoreScrip
 			</ul>
 			<ul id="groupsWrap">
 					<li id="fb">
-						<noindex><iframe src="//www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fukryama&amp;width=468&amp;height=281&amp;colorscheme=light&amp;show_faces=true&amp;border_color&amp;stream=false&amp;header=false&amp;appId=264274036927475" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:468px; height:281px;" allowTransparency="true"></iframe></noindex> 
+						<noindex><iframe src="http://www.facebook.com/plugins/likebox.php?href=http%3A%2F%2Fwww.facebook.com%2Fukryama&amp;width=468&amp;height=281&amp;colorscheme=light&amp;show_faces=true&amp;border_color&amp;stream=false&amp;header=false&amp;appId=264274036927475" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:468px; height:281px;" allowTransparency="true"></iframe></noindex> 
 					</li>
 					<li id="vk">
 						<!-- VK Widget -->
@@ -258,9 +258,10 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->clientScript->getCoreScrip
 		<div class="container">
 			<p class="rosyama"><noindex><a class="rs" target="_blank" href="http://rosyama.ru/" title="РосЯма">РосЯма</a></noindex><br/>Яму мне запили!<br/></p>
 			<p class="copy">Идея — <noindex><a href="http://navalny.ru/" rel="nofollow" target="_blank">Алексей Навальный</a></noindex>, 2011<br />
-   			Хостинг — «<noindex><a href="http://www.ukraine.com.ua/?page=59687" target="_blank" rel="nofollow">Украина</a></noindex>»<br />
+   			Хостинг — «<noindex><a href="http://www.ukraine.com.ua/" target="_blank" rel="nofollow">Украина</a></noindex>»<br />
    			<span class="studio-copyright">Дизайн — веб-студия <a href="http://stfalcon.com" target="_blank"><span class="icon"></span>stfalcon.com</a></span>
    			Разработано в <noindex><a href="http://pixelsmedia.ru" rel="nofollow" target="_blank">Pixelsmedia</a> </noindex>на Yii.<br/>
+                          
    			<a href="http://novus.org.ua/" style="background:none;" class="notus-logo" target="_blank"><img src="<?php echo Yii::app()->request->baseUrl;?>/images/logo-novus.png"></a>
 			</p>
 			
@@ -303,7 +304,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->clientScript->getCoreScrip
 		</div>
 	</div>
 	
-	<? if (!$this->user->isGuest && $flash=$this->user->getFlash('user')):?>
+	<?php if (!$this->user->isGuest && $flash=$this->user->getFlash('user')):?>
    	<div id="addDiv">
    		<div id="fon">
    		</div>
@@ -324,7 +325,7 @@ Yii::app()->clientScript->registerCssFile(Yii::app()->clientScript->getCoreScrip
    			})
    		})	
    	</script>
-	<?endif?>
+	<?php endif; ?>
 	<div class="insape"><?php
       if (!defined('_SAPE_USER')){
          define('_SAPE_USER', 'f127747a52619313d55480e54fe0ca6a'); 

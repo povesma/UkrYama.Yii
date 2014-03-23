@@ -7,7 +7,7 @@ $this->layout='//layouts/header_blank';
 <?php $this->widget('application.widgets.social.socialWidget'); ?>
 </div>
 <div class="rCol">
-<h1>Вопросы и ответы</h1>
+<h1>Питання та відповіді</h1>
 	<table class="faq-item">
 		<tr>
 			<th>Q:</th>
@@ -24,13 +24,13 @@ $this->layout='//layouts/header_blank';
 <!--	<table class="faq-item">
 		<tr>
 			<th>Q:</th>
-			<td class="question">Где я могу скачать мобильные приложения для УкрЯмы под IPhone или Android?</td>
+			<td class="question">Де я можу завантажити мобільні версії програм для УкрЯми для iPhone чи Android?</td>
 		</tr>		
 		<tr>
 			<th>A:</th>
-			<td><p>Приложение для IPhone: <a href="http://itunes.apple.com/ru/app/id456229487?mt=8">http://itunes.apple.com/ru/app/id456229487?mt=8</a></p>
-			    <p>Приложение для Android от UnrealMojo: <a href="https://market.android.com/details?id=ru.rosyama.android">https://market.android.com/details?id=ru.rosyama.android</a></p>
-			    <p>Приложение для Android от RedSolution: <a href="https://market.android.com/details?id=ru.redsolution.rosyama">https://market.android.com/details?id=ru.redsolution.rosyama</a></p>
+			<td><p>Для iPhone: <a href="http://itunes.apple.com/ru/app/id456229487?mt=8">http://itunes.apple.com/ru/app/id456229487?mt=8</a></p>
+			    <p>Для Android от UnrealMojo: <a href="https://market.android.com/details?id=ru.rosyama.android">https://market.android.com/details?id=ru.rosyama.android</a></p>
+			    <p>Для Android от RedSolution: <a href="https://market.android.com/details?id=ru.redsolution.rosyama">https://market.android.com/details?id=ru.redsolution.rosyama</a></p>
 			    <p>Приложение для Samsung Bada: <a href="http://www.samsungapps.com/topApps/topAppsDetail.as?productId=G00004062550">http://www.samsungapps.com/topApps/topAppsDetail.as?productId=G00004062550</a></p>
 			    <p>Приложение для Windows Phone: <a href="http://www.windowsphone.com/ru-RU/apps/783e000f-c9ac-4c11-af17-f5e465cd881b">http://www.windowsphone.com/ru-RU/apps/783e000f-c9ac-4c11-af17-f5e465cd881b</a></p>
 			</td>

@@ -32,6 +32,7 @@ $MESS['SEND_GAI_ONLINE']='Отправить в ГАИ онлайн!';
 $MESS['HOLE_REQUEST_FORM_LANG']                = 'Язык';
 $MESS['HOLE_REQUEST_FORM_TO_NAME']             = 'Кому';
 $MESS['HOLE_REQUEST_FORM_TO_ADDRESS']          = 'Куда';
+$MESS['HOLE_REQUEST_FORM_TO_INDEX']            = 'Индекс';
 $MESS['HOLE_REQUEST_FORM_FROM']                = 'От';
 $MESS['HOLE_REQUEST_FORM_POSTADDRESS']         = 'Почтовый адрес заявителя с индексом';
 $MESS['HOLE_REQUEST_FORM_ADDRESS']             = 'Адрес дефекта';
@@ -50,6 +51,8 @@ $MESS['HOLE_REQUEST_FORM_PRINT_PICTURES']      = 'Выводить изобра�
 $MESS['HOLE_REQUEST_FORM_PRINT_PICTURES_COMMENT']    = 'Отметьте, если нужно выводить изображения';
 $MESS['HOLE_REQUEST_FORM_PHOTO']		= 'К заявлению будет приложено {0} фото.';
 $MESS['HOLE_REQUEST_FORM_PHOTO_BUTTON']		= 'Выбрать нужные фото';
+$MESS['HOLE_REQUEST_FORM_DEFECT_TYPE']          = 'Жалоба на';
+$MESS['HOLE_REQUEST_FORM_AUTHORITY']            = 'Выберите орган для подачи жалобы';
 
 $MESS['PICTURE']				= 'Фотография';
 $MESS['PICTURE_TO']                = 'к';
@@ -62,6 +65,8 @@ $MESS['DELETE_DEFECT_CONFIRM'] = 'Вы уверены, что хотите уд�
 
 $MESS['PRINT_CLAIM']  = 'Напечатать заявление';
 $MESS['CLAIM_TO_GAI_WAS_SEND']  = 'Заявление в ГАИ отправлено';
+$MESS['CLAIM_WAS_SEND']  = 'Заявление отправлено';
+$MESS['HOLE_REPLY_RECEIVED']  = 'Ответ получен';
 $MESS['INFO_IF_DEFECT_FIXED']  = 'Если дефект устранён';
 $MESS['SET_AS_FIXED']  = 'Отметить как устранённый';
 $MESS['SET_DEFECT_AS_FIXED'] = 'Отметить дефект как устранённый';
@@ -82,13 +87,19 @@ $MESS['HOLE_CREATED_INFO'] = 'Основное инфо';
 $MESS['HOLE_CREATED'] = 'Добавлено на сайт';
 $MESS['HOLE_FIND'] = 'Выявлено';
 $MESS['HOLE_ANSWER_DATE'] = 'Дата получения ответа из ГАИ';
-$MESS['HOLE_ANSWER_CREATEDATE']='Дата загрузки ответа из ГАИ'; 
+$MESS['HOLE_ANSWER_CREATEDATE']='Дата загрузки ответа из ГАИ';
+
+$MESS['HOLE_ANSWER_DATE_FROM'] = 'Дата получения ответа из {0}';
+$MESS['HOLE_ANSWER_CREATEDATE_FROM']='Дата загрузки ответа из {0}'; 
+
 $MESS['HOLE_FIX_DATE'] = 'Дата исправления дефекта';
 $MESS['HOLE_FIX_CREATEDATE']='Дата загрузки на сайт отметки об исправлении'; 
 $MESS['HOLE_FIX_USER'] = '{0}: Исправлено';
 $MESS['HOLE_REQUEST_USER'] = '{0}: Запрос в ГАИ';
-$MESS['HOLE_REQUEST_DELIVERDATE'] = 'Запрос в ГАИ: Статус доставки';
+$MESS['HOLE_REQUEST_USER_TO'] = '{0}: Запрос в {1}';
+$MESS['HOLE_REQUEST_DELIVERDATE'] = 'Статус доставки в {0}';
 $MESS['HOLE_REQUEST_NOTDELIVERED'] = 'Еще не доставлено';
+$MESS['HOLE_REQUEST_DELIVERED'] = 'Доставлено в {0}';
 $MESS['HOLE_REQUEST_PROSECUTOR_USER'] = '{0}: Запрос в прокуратуру';
 $MESS['HOLE_ANSWER_PROSECUTOR_DATE'] = 'Дата получения ответа из прокуратуры';
 $MESS['HOLE_ANSWER_PROSECUTOR_CREATEDATE']='Дата загрузки ответа из прокуратуры'; 
@@ -96,7 +107,9 @@ $MESS['HOLE_ANSWER_PROSECUTOR_CREATEDATE']='Дата загрузки ответ
 
 $MESS['HOLE_CART_ADMIN_GIBDD_REPLY_RECEIVED'] = 'Получен ответ из ГАИ';
 $MESS['HOLE_GIBDDREPLY'] = 'Ответ из ГАИ';
+$MESS['HOLE_REPLY'] = 'Ответ из ';
 $MESS['HOLE_GIBDDREPLY_USER_DATE'] = 'Ответ из ГАИ пользователю {0} от {1}';
+$MESS['HOLE_AUTHREPLY_USER_DATE'] = 'Ответ из {0} пользователю {1} от {2}';
 $MESS['INFO_IF_BAD_RESPONSE'] = 'Если вас не устраивает ответ ГАИ, то можно';
 $MESS['INFO_TO_PROSECUTOR'] = 'подать Заявление в Прокуратуру';
 $MESS['INFO_REQUEST_TO_GIBDD'] = 'Вы тоже можете отправить свой запрос в ГАИ по этому дефекту';

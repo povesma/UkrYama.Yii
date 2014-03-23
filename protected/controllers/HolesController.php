@@ -27,15 +27,15 @@ class HolesController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('add','newAdd', 'territorialGibdd','smallhole','index','view', 'findSubject', 'findCity', 'map', 'ajaxMap', 'reply'),
+				'actions'=>array('add','smallhole','index','view', 'findRegion', 'findCity', 'map','map2', 'ajaxMap'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('getauth','TrackMail','update', 'personal','personalDelete','request','langChange','requestForm','sent','notsent','gibddreply', 'fix', 'defix', 'prosecutorsent', 'prosecutornotsent','delanswerfile','myarea', 'delpicture','selectHoles','sentMany','review'),
+				'actions'=>array('getauth','TrackMail','update', 'personal','personalDelete','requestForm','sent','notsent','reply','fix', 'defix', 'delanswerfile','myarea', 'delpicture','selectHoles','review'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
-				'actions'=>array('delete', 'moderate'),
+				'actions'=>array('delete', 'moderate', 'test','test2'),
 				'groups'=>array('root', 'admin', 'moder'), 
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -51,62 +51,92 @@ class HolesController extends Controller
 		$auth=$_POST['auth'];
 		$lang=$_POST['lang'];
 		$data=Authority::model()->findByPk(array("id"=>$auth,"lang"=>$lang));
-		if($data->o_name===""){
-			$data->o_name="Начальнику";
-		}
-		echo "{'address' : '".$data->address."', 'name' : '".$data->o_name."','index':'".$data->index."'}";
+//		if($data->o_name===""){
+			$data->o_name=$data->name;
+//		}
+		echo "{'address' : '".$data->address.(strlen($data->index)>0?", ".$data->index:"")."', 'name' : '".$data->o_name."'}";
 	}
-	public function actionFindSubject()
+	public function actionFindRegion()
 	{
-	
 		$q = $_GET['term'];
-       if (isset($q)) {
-	  $criteria = new CDbCriteria;
-	  $criteria->params = array(':q' => '%'.trim($q).'%');
-	  $criteria->condition = 'name LIKE (:q)'; 
-	  $RfSubjects = RfSubjects::model()->findAll($criteria); 
- 
-	  if (!empty($RfSubjects)) {
-	      $out = array();
-	      foreach ($RfSubjects as $p) {
-		 $out[] = array(
-		     // expression to give the string for the autoComplete drop-down
-		     //'label' => preg_replace('/('.$q.')/i', "<strong>$1</strong>", $p->name_full),  
-		     'label' =>  $p->name_full,  
-		     'value' => $p->name_full,
-		     'id' => $p->id, // return value from autocomplete
-		 );
-	      }
-	      echo CJSON::encode($out);
-	      Yii::app()->end();
-	  }
-       }
-	}
-
-	public function actionTest(){
-
-//select all holes uploaded more than 3 days ago and gibdd not sent since then
-/*
-		$holes = Holes::model()->with('requests_gibdd_not')->with('user')->findAll();
-		foreach($holes as $hole){
-			if(strlen($hole->user->email)>0){
-			echo $hole->user->username." : ".$hole->user->name." - ".$hole->user->last_name." : ".$hole->ID." : ".$hole->ADDRESS." : ".$hole->user->email."<br>\n";
+		if (isset($q)) {
+			$lang=Yii::app()->getLanguage();
+			if($lang=="uk_ua") $lang="ua";
+			$criteria = new CDbCriteria;
+			$criteria->params = array(':q' => '%'.trim($q).'%');
+			$criteria->condition = 'name LIKE (:q) and lang="'.$lang.'"';
+			$regions=Region::model()->findAll($criteria);
+			if (!empty($regions)) {
+				$out = array();
+				foreach ($regions as $p) {
+				$out[] = array(
+					// expression to give the string for the autoComplete drop-down
+					//'label' => preg_replace('/('.$q.')/i', "<strong>$1</strong>", $p->name_full),  
+					'label' =>  $p->name,
+					'value' => $p->name,
+					'id' => $p->id, // return value from autocomplete
+				);
+				}
+			echo CJSON::encode($out);
+			Yii::app()->end();
 			}
 		}
-*/
-//		$holes = Holes::model()->with('requests_gibdd')->with('answers')->with('hole')->findAll();
-
-//request sent but answear is not recieved
+	}
+	public function actionTest(){
+	if(isset($_POST['hole'])){
+		$HoleCheck=new HoleCheck;
+		$HoleCheck->hole_id=$_POST['hole'];
+		$HoleCheck->type=$_POST['type'];
+		$HoleCheck->region_id=$_POST['region_id'];
+		if($HoleCheck->save()) echo 1;
+		exit;
+	}
+	echo "<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'></script><style>span{cursor:pointer;}</style>";
+	$holes = Holes::model()->findAll(array('order'=>'ADDRESS'));
+	foreach($holes as $hole){
+		$region=$hole->region();
+		if(count($region)&&!count(HoleCheck::model()->find("hole_id=:hole_id",array(":hole_id"=>$hole->ID)))){
+			$holetype=$hole->type->findByPk(array("id"=>$hole->TYPE_ID,"lang"=>"ru"));
+			$auth=$hole->getAuthByType($region,2,"ru");
+			$regP=$region->parent;
+			$top="";
+			if($regP->ref_id>0){$top=" - ".$regP->name;}
+			echo "<div id='hid_".$hole->ID."'><hr>Hole ID:".$hole->ID."<br>\nAddress: ".$hole->ADDRESS."<br>\nType: ".$holetype->alias."<br>\n Best guess for Region is: ".$region->name.$top."<br>\nAuthority suggested: ".$auth[0]->name."<br>\n";
+			echo CHtml::link(Yii::t('holes_view', 'EDIT'), array('update', 'id'=>$hole->ID), array('target'=>'_blank'));
+			echo "<div><span onClick='$.post(\"/holes/test\",{hole:".$hole->ID.",type:1,region_id:".$region->id."});$(\"#hid_".$hole->ID."\").remove();' style='background-color:green'>GOOD</span> | <span onClick='$.post(\"/holes/test\",{hole:".$hole->ID.",type:2,region_id:".$region->id."});$(\"#hid_".$hole->ID."\").remove();' style='background-color:red'>BAD</span></div>";
+			echo "</div>";
 /*
-		$requests = HoleRequests::model()->with('answers')->with('hole')->findAll('type="gibdd"');
-		foreach($requests as $req){
-			if(!count($req->answers) && (time() - $req->date_sent)>345600){
-				if(strlen($req->hole->user->email)>0){
-					echo $req->hole->user->username." : ".$req->hole->user->name." - ".$req->hole->user->last_name." : ".$req->hole->ID." : ".$req->hole->user->email." : ".$req->hole->ADDRESS."<br>\n";
+			$reqs=$hole->requests;
+			if(count($reqs)){					
+				echo "<hr>".$hole->ID." Address: ".$hole->ADDRESS." - Type: ".$holetype->alias." - Region is: ".$region->name."<br>\n";
+				foreach($reqs as $req){
+					echo "Present: Auth ID: ".$req->gibdd_id.": ".$req->auth_ru->name."<br>\n";
+					$auth=$hole->getAllAuth($region,$holetype,"ru");
+					foreach($auth as $au){
+						if($au->type==2){
+							echo "Could be replaced with: ".$au->name."<br>\n";
+						}
+					}
 				}
 			}
-		}
 */
+		}
+	}
+		return;
+	}
+	public function actionTest2(){
+	echo "<script src='http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js'></script><style>span{cursor:pointer;}</style>";
+	$holes = Holes::model()->findAll(array('order'=>'ADDRESS'));
+	foreach($holes as $hole){
+		$region=$hole->region();
+		if(count($region)&&!count(HoleCheck::model()->find("hole_id=:hole_id",array(":hole_id"=>$hole->ID)))){
+			$holetype=$hole->type->findByPk(array("id"=>$hole->TYPE_ID,"lang"=>"ru"));
+			echo "<div id='hid_".$hole->ID."'><hr>Hole ID:".$hole->ID."<br>\nAddress: ".$hole->ADDRESS."<br>\nType: ".$holetype->alias."<br>\n Best guess for Region is: ".$region->name.$top."<br>\nAuthority suggested: ".$auth[0]->name."<br>\n";
+			echo CHtml::link(Yii::t('holes_view', 'EDIT'), array('update', 'id'=>$hole->ID), array('target'=>'_blank'));
+			echo "<div><span onClick='$.post(\"/holes/test\",{hole:".$hole->ID.",type:1,region_id:".$region->id."});$(\"#hid_".$hole->ID."\").remove();' style='background-color:green'>FIXED</span>";
+			echo "</div>";
+		}
+	}
 		return;
 	}
 
@@ -117,7 +147,7 @@ class HolesController extends Controller
 		   if (isset($q)) {
 			   $criteria = new CDbCriteria;	  
 			   $criteria->params = array(':q' => trim($q).'%');
-			   if (isset($_GET['Holes']['ADR_SUBJECTRF']) && $_GET['Holes']['ADR_SUBJECTRF']) $criteria->condition = 'ADR_CITY LIKE (:q) AND ADR_SUBJECTRF='.$_GET['Holes']['ADR_SUBJECTRF']; 
+			   if (isset($_GET['Holes']['region_id']) && $_GET['Holes']['region_id']) $criteria->condition = 'ADR_CITY LIKE (:q) AND region_id='.$_GET['Holes']['region_id']; 
 			   else $criteria->condition = 'ADR_CITY LIKE (:q)'; 
 			   $criteria->group='ADR_CITY';
 			   $Holes = Holes::model()->findAll($criteria); 
@@ -213,8 +243,8 @@ class HolesController extends Controller
 			echo $page;
 		}
 	}
-	public function actionNewAdd(){
-      $this->layout = '//layouts/header_blank';
+	public function actionAdd(){
+		$this->layout = '//layouts/header_blank';
 		$model = new Holes;
 		$model->USER_ID = Yii::app()->user->id;
 		if(isset($_POST['Holes'])){
@@ -254,82 +284,14 @@ class HolesController extends Controller
 			$geoIp = new EGeoIP();
 			$geoIp->locate($request->userHostAddress); 	
 			//echo ($request->userHostAddress);
-			if ($geoIp->longitude) $model->LATITUDE=$geoIp->longitude;
-			if ($geoIp->latitude) $model->LONGITUDE=$geoIp->latitude;
+			if ($geoIp->latitude) $model->LATITUDE=$geoIp->latitude;
+			if ($geoIp->longitude) $model->LONGITUDE=$geoIp->longitude;
+			$model->DATE_CREATED=time();
 		}
-		$address=split(", ",$_POST['Holes']['ADDRESS']);
-		foreach($address as $sub){
-			$name=mb_strtolower($sub,'UTF-8');
-			$region=Region::model()->find('LOWER(name) like :name',array(':name'=>$name));
-			echo $region->name;
-	}
-
 		$this->render('holeform', array('model'=>$model));
 	}
-	public function actionAdd()
-	{
-      $this->layout = '//layouts/header_blank';
-		$model=new Holes;
-		$model->USER_ID = Yii::app()->user->id;
-		$model->DATE_CREATED = time();
-		$cs=Yii::app()->getClientScript();
-      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
 
-		if(isset($_POST['Holes'])){
-			$model->attributes = $_POST['Holes'];
-			if($model->USER_ID===0 || $model->USER_ID === null){
-				$users = UserGroupsUser::model()->findAllByAttributes(array(),"email=:email",array(":email"=>$_POST['Holes']['EMAIL']));
-				if(count($users)==0){
-					$umodel=new UserGroupsUser('autoregistration');
-					$umodel->username=$_POST['Holes']['EMAIL'];
-					$umodel->name=$_POST['Holes']['FIRST_NAME'];
-					$umodel->last_name=$_POST['Holes']['LAST_NAME'];
-					$umodel->email=$_POST['Holes']['EMAIL'];
-					$umodel->password=$this->randomPassword();
-					if($umodel->save()){$model->USER_ID=$umodel->primaryKey;}
-					}else{
-						$model->USER_ID=$users[0]->id;
-					}
-			}
-			$model->DATE_CREATED = strtotime($_POST['defectdate']);
-			if (!$model->DATE_CREATED)
-				$model->DATE_CREATED = mktime(0, 0, 0, date("m")  , date("d"), date("Y"));
-			if ($model->DATE_CREATED < time()-(7 * 86400))
-				$model->addError("DATE_CREATED",Yii::t('template', 'DATE_CANT_BE_PAST', array('{attribute}'=>$model->getAttributeLabel('DATE_CREATED')))); 
 
-			$subj=RfSubjects::model()->SearchID(trim($model->STR_SUBJECTRF));
-			if($subj) 
-			   $model->ADR_SUBJECTRF=$subj;
-			else 
-			   $model->ADR_SUBJECTRF=0;
-			$model->ADR_CITY=trim($model->ADR_CITY);
-			
-			$model->PREMODERATED = (Yii::app()->user->level > 50) ? 1 : 0; 
-
-	
-			$tran = $model->dbConnection->beginTransaction();
-			if ($model->validate(null, false)) {
-				if($model->save() && $model->savePictures()){
-					$tran->commit();
-					$this->redirect(array('view','id'=>$model->ID));
-				}
-			}
-		}
-		else {
-			//выставляем центр на карте по координатам IP юзера
-			$request = new CHttpRequest;
-			$geoIp = new EGeoIP();
-			$geoIp->locate($request->userHostAddress); 	
-			//echo ($request->userHostAddress);
-			if ($geoIp->longitude) $model->LATITUDE=$geoIp->longitude;
-			if ($geoIp->latitude) $model->LONGITUDE=$geoIp->latitude;
-		}
-
-		$this->render('add',array(
-			'model'=>$model,			
-		));
-	}
-	
 	private function randomPassword() {
 	    $alphabet = "abcdefghijklmnopqrstuwxyzABCDEFGHIJKLMNOPQRSTUWXYZ0123456789";
 	    for ($i = 0; $i < 8; $i++) {
@@ -339,39 +301,6 @@ class HolesController extends Controller
 	    return $pass;
 	}
 
-	//Список ГИБДД возле ямы
-	public function actionTerritorialGibdd()
-	{
-/*
-	if(isset($_POST['Holes'])) {
-		$address=split(", ",$_POST['Holes']['ADDRESS']);
-		foreach($address as $sub){
-			$name=mb_strtolower($sub,'UTF-8');
-			$region=Region::model()->find('LOWER(name) like :name',array(':name'=>$name));
-			echo $region->name;
-		}
-	}
-*/
-		if(isset($_POST['Holes'])) {
-			$model=new Holes;
-			$model->attributes=$_POST['Holes'];
-			//думаю, 4 первых буквы хватает для однозначного определения области
-			$s=mb_substr(mb_strtolower(trim($model->STR_SUBJECTRF),'UTF-8'),0,6,'UTF-8');
-			$subj=RfSubjects::model()->find('LOWER(name_full) LIKE :name', array(':name'=>'%'.$s.'%'));
-
-			if(Yii::app()->user->getLanguage()=="ru"){
-				$data=GibddHeads_ru::model()->findAll('subject_id=:id',array(':id'=>$subj->id));
-			}else{
-				$data=GibddHeads_ua::model()->findAll('subject_id=:id',array(':id'=>$subj->id));
-			}
-		    foreach($data as $value) { 
-				echo CHtml::tag('option',
-					array('value'=>$value->id),CHtml::encode($value->gibdd_name),true);
-		    }
-			
-		}
-	}
-
 	/**
 	 * Updates a particular model.
 	 * If update is successful, the browser will be redirected to the 'view' page.
@@ -379,36 +308,21 @@ class HolesController extends Controller
 	 */
 	public function actionUpdate($id)
 	{
-		$this->layout='//layouts/header_user';
-		
+		$this->layout = '//layouts/header_blank';
 		$model=$this->loadChangeModel($id);
-		
-      if($model->STATE != Holes::STATE_FRESH)	
-	throw new CHttpException(403,'Редактирование не нового дефекта запрещено');
-
-
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
-		$cs=Yii::app()->getClientScript();
-      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
-
+		if(!Yii::app()->user->isModer){
+			if($model->STATE != Holes::STATE_FRESH)
+			throw new CHttpException(403,'Редактирование не нового дефекта запрещено');
+		}
 		if(isset($_POST['Holes']))
 		{
 			$model->attributes=$_POST['Holes'];
 	$model->DATE_CREATED = strtotime($_POST['defectdate']);
-			if ($model->DATE_CREATED < time()-(7 * 86400))
-	   $model->addError("DATE_CREATED",Yii::t('template', 'DATE_CANT_BE_PAST', array('{attribute}'=>$model->getAttributeLabel('DATE_CREATED')))); 
-
-			if ($model->STR_SUBJECTRF){
-				$subj=RfSubjects::model()->SearchID(trim($model->STR_SUBJECTRF));
-				if($subj) $model->ADR_SUBJECTRF=$subj;
-			}
 			if ($model->validate(null, false)) {
    			if($model->save() && $model->savePictures())
    				$this->redirect(array('view','id'=>$model->ID));
 	}
 		}
-
 		$this->render('update',array(
 			'model'=>$model,
 		));
@@ -417,95 +331,24 @@ class HolesController extends Controller
 	public function actionReply($id=null){
 		$this->layout='//layouts/header_user';
 		$hole=$this->loadModel($id);
-		$this->render('reply',array('hole'=>$this->loadModel($id)));
-	}
+		if(isset($_POST['answerdate'])){
+			$answer = new HoleAnswers;
+			$answer->date=strtotime($_POST['answerdate']);
+			$answer->comment=$_POST['comment'];
 
-	public function actionGibddreply($id=null, $holes=null)
-	{
-		$this->layout='//layouts/header_user';
-		$count=0;
-		$firstAnswermodel=Array();
-		$models=Array();
-		if (!$holes){
-	$model=$this->loadModel($id);
-	$model->scenario='gibdd_reply';
-	if($model->STATE!=Holes::STATE_INPROGRESS && $model->STATE!=Holes::STATE_ACHTUNG && !$model->request_gibdd)	
-	   throw new CHttpException(403,'Доступ запрещен.');
-	$models[]=$model;
-		}	
-		else{ 
-	$models=Holes::model()->findAllByPk(explode(',',$holes));
-      }
-		
-      foreach ($models as $i=>$model){
-			if($model->STATE!=Holes::STATE_INPROGRESS && $model->STATE!=Holes::STATE_ACHTUNG && !$model->request_gibdd) {
-			   unset ($models[$i]); continue;
-	}
-			$answer=new HoleAnswers;
-	$answer->date = time();
-			if (isset($_GET['answer']) && $_GET['answer'])
-				$answer=HoleAnswers::model()->findByPk((int)$_GET['answer']);
-
-			$answer->request_id=$model->request_gibdd->id;
-	
-			if(isset($_POST['HoleAnswers'])){					
-				$answer->attributes=$_POST['HoleAnswers'];
-	   $answer->date = strtotime($_POST['answerdate']);
-   		//	if ($model->date < $model->request_gibdd->DATE_STATUS))
-	 //     $model->addError("DATE_CREATED",Yii::t('template', 'DATE_CANT_BE_PAST', array('{attribute}'=>$model->getAttributeLabel('DATE_CREATED')))); 
-
-
-	   //if (isset($_POST['HoleAnswers']['results'])) $answer->results=$_POST['HoleAnswers']['results'];
-				$answer->request_id=$model->request_gibdd->id;
-					   
-				if ($firstAnswermodel) 
-	      $answer->firstAnswermodel=$firstAnswermodel;
-	      
-	   $tran = $answer->dbConnection->beginTransaction();
-				if($answer->save()){
-					if ($model->STATE==Holes::STATE_INPROGRESS || $model->STATE==Holes::STATE_ACHTUNG)
-						$model->STATE=Holes::STATE_GIBDDRE;
-					$model->GIBDD_REPLY_RECEIVED=1;
-					if (!$model->DATE_STATUS) $model->DATE_STATUS=time();
-					if ($model->update()){					
-						if ($count==0) 
-		   $firstAnswermodel=$answer;
-						$count++;
-						$links[]=CHtml::link($model->ADDRESS,Array('view','id'=>$model->ID));
-		$tran->commit();						
-						if (!$holes) 
-		   $this->redirect(array('view','id'=>$model->ID));						
-					}
-				}					
-				
-			}
-			else {
-				if (!$answer->isNewRecord) 
-	      $answer->results=CHtml::listData($answer->results,'id','id');
+			$requests=$hole->requests_user;
+//			if(count($requests)>0){
+//				$req=$requests[count($requests)-1];
+//				$answer->request_id=$req->id;
+				$answer->request_id=$_POST['req_id'];
+//			}else{return false;}
+			if($answer->save()){
+				$this->redirect(array('view','id'=>$hole->ID));
 			}
 		}
-		
-		if ($holes && $count) {
-	if($count) 
-	   Yii::app()->user->setFlash('user', 'Успешная загрузка ответа ГАИ на ямы: <br/>'.implode('<br/>',$links).'<br/><br/><br/>');
-	else 
-	   Yii::app()->user->setFlash('user', 'Произошла ошибка! Ни одного ответа не загружено');
-	$this->redirect(array('personal')); 
-		}	
-
-		// Uncomment the following line if AJAX validation is needed
-		// $this->performAjaxValidation($model);
-		$cs=Yii::app()->getClientScript();
-      $cs->registerCssFile(Yii::app()->request->baseUrl.'/css/add_form.css');
-      $cs->registerScriptFile('http://api-maps.yandex.ru/1.1/index.xml?key='.$this->mapkey);
-		
-		$this->render('gibddreply',array(
-			'models'=>$models,
-			'answer'=>$answer,
-			'jsplacemarks'=>'',
-		));
+		$this->render('reply',array('hole'=>$hole));
 	}
-	
+
 	public function actionFix($id)
 	{
 		$this->layout='//layouts/header_user';
@@ -518,7 +361,7 @@ class HolesController extends Controller
   
 
 		if (!$model->isUserHole && Yii::app()->user->level < 50){
-			if ($model->STATE==Holes::STATE_FIXED || !$model->request_gibdd || !$model->request_gibdd->answers || $model->user_fix)
+			if ($model->STATE==Holes::STATE_FIXED || !$model->requests || !$model->requests_user[0]->answers || $model->user_fix)
 				throw new CHttpException(403,'Доступ запрещен.');
 		}		
 		elseif ($model->STATE==Holes::STATE_FIXED && $model->user_fix)
@@ -646,7 +489,9 @@ class HolesController extends Controller
 		$postaddress=$_POST[$lang.'_postaddress'];
 		$signature=$_POST[$lang.'_signature'];
 
+		$auth=Authority::model()->findByPk(array('id'=>$auth,'lang'=>$lang));
 		$model=$this->loadModel($id);
+
 		$pics=array();
 		$photos="";
 		$ulang=Yii::app()->user->getLanguage();
@@ -658,158 +503,93 @@ class HolesController extends Controller
 			$lang="ua";
 		}
 
-		$_data = array(
-			"ref" => "$id",
-			"to_name" =>$to_name,
-			"to_address"=>$to_address,
-			"to_index"=>$to_index,
-			"from_name"=>$from,
-			"from_address"=>$postaddress,
-			"when"=>strftime("%e ".Yii::t('month', date("n"))." %Y", $model->DATE_CREATED ? $model->DATE_CREATED : time()),
-			"where"=>$request->address,
-			"date"=>strftime("%e ".Yii::t('month', date("n"))." %Y", time()),
-			"init"=>$signature,
-			"c_photos"=>count($pics),
-			"files"=>$photos
-		);
-				if($request->html)
-				{
-					header('Content-Type: text/html; charset=utf8', true);
-					$printer = Yii::app()->Printer;
-//					echo $printer->printHTML($_data, $formType, $lang);
-					$name="$formType"."_$lang";
-					$tplname = YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$name.".php";
-					$css = file_get_contents(YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$formType.".css"); 
-					$html = $this->renderFile($tplname,$_data,true);
-					$html = "<style>$css</style>\n$html";
-					echo $html;
-					return;
-				}//end print html
-				else
-				{//print pdf
-					$printer = Yii::app()->Printer;
-//					$filename="ukryama-".date("Y-m-d_G-i-s");
-//					echo $printer->printPDF($_data, $formType, $lang, $filename);
+		$pics=array_keys($_POST['chpk']);
+		setlocale(LC_ALL, 'ru_RU.UTF-8');
 
-					$name="$formType"."_$lang";
-					$tplname = YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$name.".php";
-					if(file_exists($tplname)){
-						$css = file_get_contents(YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$formType.".css"); 
-						$html = $this->renderFile($tplname,$_data,true);
+		$photos = "";
+		$pnum=1;
+		$images=array();
 
-						$outname="ukryama-".date("Y-m-d_G-i-s");
-						echo $printer->printH2P($html, $css, $outname);
-						return;
-					}
-				}//end print pdf
-
-//		echo "Lang: $lang\n Holetype: $holetype\nAuth: $auth\nTo Name: $to_name\nTo Address: $to_address\nTo Index: $to_index\n";
-//		echo "From: $from\nPost Address: $postaddress\nSignature: $signature\n";
-/*
-		if ($id){
-				$gibdd=GibddHeads_ua::model()->findByPk((int)$id);
-			$holemodel=Holes::model()->findAllByPk(explode(',',$holes));
-			if ($type=='gibdd') 
-				$this->renderPartial('_form_gibdd_manyholes',Array('holes'=>$holemodel, 'gibdd'=>$gibdd));
-		}
-		//else echo "Выбирите отдел ГИБДД";
-*/
-	}	
-
-	//генерация запросов в ГАИ
-	public function actionLangchange($id=null){
-		$lang=$_POST['lang'];
-		if($id){$model=$this->loadModel($id);};
-		$head=$model->gibdd->id;
-		if($lang=="ru"){
-			$gibdd=GibddHeads_ru::model()->findByPk($head);
+		$model=$this->loadModel($id);
+		if(count($model->requests_user)>0){$first=1;}else{$first=0;}
+		if($first!=0){
+			$pictures=$hole->pictures_fresh;
 		}else{
-			$gibdd=GibddHeads_ua::model()->findByPk($head);
+			$pictures=$answ->files_img;
+			$picPath=$model->requests_user[0]->answer->filesFolder.'/';
 		}
-		echo $gibdd->address."|".$gibdd->post_dative."|".$gibdd->fio_dative;
-	}
-
-	public function actionRequest($id=null)
-	{
-			if ($id) $model=$this->loadModel($id);
-			else $model=new Holes;
-			$request=new HoleRequestForm;
-			if(isset($_POST['HoleRequestForm']))
-			{
-
-				$request->attributes=$_POST['HoleRequestForm'];
-				$pics=array_keys($_POST['chpk']);
-				$_images = array();
-				setlocale(LC_ALL, 'ru_RU.UTF-8');
-
-				$photos = "";
-				$pnum=1;
-				$images=array();
+			if($_POST['map_ch']==="on"){
+				$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'Карта').' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="http://maps.googleapis.com/maps/api/staticmap?center='.str_replace(',','.',$model->LATITUDE).','.str_replace(',','.',$model->LONGITUDE).'&zoom=14&size=400x400&markers=color:red%7Clabel:Дефект%7Cicon:http://ukryama.com/images/st1234/'.$model->type->alias.'_'.$model['STATE'].'.png|'.str_replace(',','.',$model->LATITUDE).','.str_replace(',','.',$model->LONGITUDE).'&sensor=false"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+			}
 				foreach($model->pictures_fresh as $picture){
 					$pid = $picture->id;
 					foreach($pics as $pic){
 						if($pic==$pid){
-							$pfile=$picture->original;
-							$image=Yii::app()->image->load(Yii::getPathOfAlias('webroot').$pfile);
+							if(!$first){
+								$pfile=$picture->original;
+								$image=Yii::app()->image->load(Yii::getPathOfAlias('webroot').$pfile);
 
-							if($image->__get("height")>$image->__get("width")){
-								$image->rotate(-90);
-								$fname=$pfile;
+								if($image->__get("height")>$image->__get("width")){
+									$image->rotate(-90);
+									$fname=$pfile;
 
-								preg_match('/[^?]*/', $fname, $matches);
-							        $string = $matches[0];
-								$pattern = preg_split('/\./', $string, -1, PREG_SPLIT_OFFSET_CAPTURE);
-							        $filenamepart = $pattern[count($pattern)-1][0];
-								preg_match('/[^?]*/', $filenamepart, $matches);
-								$lastdot = $pattern[count($pattern)-1][1];
-								$filename = substr($string, 0, $lastdot-1);
-							        $pfile=$filename.".rotated.".$matches[0];
-								$image->save(Yii::getPathOfAlias('webroot').$pfile);
-							}
-							if($request->html){
-								$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="'.$pfile.'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+									preg_match('/[^?]*/', $fname, $matches);
+								        $string = $matches[0];
+									$pattern = preg_split('/\./', $string, -1, PREG_SPLIT_OFFSET_CAPTURE);
+								        $filenamepart = $pattern[count($pattern)-1][0];
+									preg_match('/[^?]*/', $filenamepart, $matches);
+									$lastdot = $pattern[count($pattern)-1][1];
+									$filename = substr($string, 0, $lastdot-1);
+								        $pfile=$filename.".rotated.".$matches[0];
+									$image->save(Yii::getPathOfAlias('webroot').$pfile);
+								}
+								if($request->html){
+									$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="'.$pfile.'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+								}else{
+									$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="data:image/jpg;base64,'.base64_encode(file_get_contents(Yii::getPathOfAlias('webroot').$pfile)).'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+								}
 							}else{
-$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="data:image/jpg;base64,'.base64_encode(file_get_contents(Yii::getPathOfAlias('webroot').$pfile)).'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+								$pfile=$picPath.$picture->file_name;
+								if($request->html){
+									$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="'.$pfile.'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+								}else{
+									$photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.' '.Yii::t('holes_view', 'PICTURE_TO').' №'.$id.'<br><img height="500px" src="data:image/jpg;base64,'.base64_encode(file_get_contents(Yii::getPathOfAlias('webroot').$pfile)).'"></td></tr><tr><td colspan=2 class="smv-spacer"></td></tr>'."\n";
+								}
+
 							}
 						$pnum++;
 						}
 					}
 				}
-				$lang=Yii::app()->user->getLanguage();
-				if($request->lang=="ru"){
-					Yii::app()->setLanguage("ru");
-					$lang="ru";
-				}else{
-					Yii::app()->setLanguage("uk_ua");
-					$lang="ua";
-				}
-				$_data = array(
-					"ref" => "$id",
-					"to_name" => $request->to_name,
-					"to_address"=>$request->to_address,
-					"from_name"=>$request->from,
-					"from_address"=>$request->postaddress,
-					"when"=>strftime("%e ".Yii::t('month', date("n"))." %Y", $model->DATE_CREATED ? $model->DATE_CREATED : time()),
-					"where"=>$request->address,
-					"date"=>strftime("%e ".Yii::t('month', date("n"))." %Y", time()),
-					"init"=>$request->signature,
-					"c_photos"=>count($pics),
-					"files"=>$photos
-				);
-				if($request->form_type=="prosecutor2"){
-					$formType="prosecutor2";
-				}else{
+
+		$_data = array(
+			"ref" => "$id",
+			"to_name" =>$to_name,
+			"to_address"=>$to_address,
+			"from_name"=>$from,
+			"from_address"=>$postaddress,
+			"when"=>strftime("%e ".Yii::t('month', date("n"))." %Y", $model->DATE_CREATED ? $model->DATE_CREATED : time()),
+			"where"=>$model->ADDRESS,
+			"date"=>strftime("%e ".Yii::t('month', date("n"))." %Y", time()),
+			"init"=>$signature,
+			"c_photos"=>count($pics),
+			"files"=>$photos,
+			"map"=>1
+		);
+				if(!$first){
 					$formType=$model->type['alias'];
+				}else{
+					$formType="prosecutor2";
 				}
 
-				if($request->html)
+				if($_POST['print']=="HTML")
 				{
 					header('Content-Type: text/html; charset=utf8', true);
 					$printer = Yii::app()->Printer;
 //					echo $printer->printHTML($_data, $formType, $lang);
 					$name="$formType"."_$lang";
-					$tplname = YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$name.".php";
-					$css = file_get_contents(YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$formType.".css"); 
+					$tplname = YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/".$auth->atype->alias."_".$name.".php";
+					$css = file_get_contents(YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/".$auth->atype->alias."_".$formType.".css"); 
 					$html = $this->renderFile($tplname,$_data,true);
 					$html = "<style>$css</style>\n$html";
 					echo $html;
@@ -818,13 +598,10 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 				else
 				{//print pdf
 					$printer = Yii::app()->Printer;
-//					$filename="ukryama-".date("Y-m-d_G-i-s");
-//					echo $printer->printPDF($_data, $formType, $lang, $filename);
-
 					$name="$formType"."_$lang";
-					$tplname = YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$name.".php";
+					$tplname = YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/".$auth->atype->alias."_".$name.".php";
 					if(file_exists($tplname)){
-						$css = file_get_contents(YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/gai_".$formType.".css"); 
+						$css = file_get_contents(YiiBase::getPathOfAlias($printer->params['templates'])."/dyplates/".$auth->atype->alias."_".$formType.".css"); 
 						$html = $this->renderFile($tplname,$_data,true);
 
 						$outname="ukryama-".date("Y-m-d_G-i-s");
@@ -832,9 +609,8 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 						return;
 					}
 				}//end print pdf
-			}		
-	}		
 
+	}
 	/**
 	 * Lists all models.
 	 */
@@ -847,11 +623,7 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 		$model->unsetAttributes();  // clear any default values
 		$model->PREMODERATED=1;
 		if(isset($_POST['Holes']) || isset($_GET['Holes']))
-			$model->attributes= Yii::app()->request->getParam('Holes');//isset($_POST['Holes']) ? $_POST['Holes'] : $_GET['Holes'];
-
-		//if ($model->ADR_CITY=="Город") 
-      //   $model->ADR_CITY='';
-
+			$model->attributes= Yii::app()->request->getParam('Holes');
 		$dataProvider=$model->search();
 
 		$this->render('index',array(
@@ -866,8 +638,12 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 			$model=$this->loadModel($id);
 			if (!$model->PREMODERATED) {
 				$model->PREMODERATED=1;
-				if ($model->update()) echo 'ok';
+				if(isset($_GET['ajax'])){
+					if ($model->update()) echo "ok";
+				}else{
+					if ($model->update()) $this->redirect($_SERVER['HTTP_REFERER']);
 				}
+			}
 			elseif (isset($_GET['ajax']) && $_GET['ajax']=='holes-grid'){
 				$model->PREMODERATED=0;
 				if ($model->update()) echo 'ok';	
@@ -887,13 +663,13 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 
 	public function trackMail($id){
 		$http=new Http;
-		$url="http://services.ukrposhta.com/barcodesingle/default.aspx?ctl00%24centerContent%24scriptManager=ctl00%24centerContent%24scriptManager%7Cctl00%24centerContent%24btnFindBarcodeInfo&__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=%2FwEPDwULLTEzNTgyOTE0MTcPZBYCZg9kFgICAw9kFgYCAQ8WAh4FY2xhc3MFBmxvZ29VS2QCAw8WAh4HVmlzaWJsZWgWAmYPZBYCAgEPZBYCAgEPDxYCHgRUZXh0BVXQktGW0LTRgdGC0LXQttC10L3QvdGPINC%2F0LXRgNC10YHQuNC70LDQvdC90Y8g0L%2FQvtGI0YLQvtCy0LjRhSDQstGW0LTQv9GA0LDQstC70LXQvdGMZGQCBQ9kFgYCAQ8PFgIfAgUe0KjQsNC90L7QstC90ZYg0LrQu9GW0ZTQvdGC0LghZGQCAg8WAh4JaW5uZXJodG1sBcEEJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A70JLQuCDQvNC%2B0LbQtdGC0LUg0LTRltC30L3QsNGC0LjRgdGPINC%2F0YDQviDQvNGW0YHRhtC10LfQvdCw0YXQvtC00LbQtdC90L3RjyDRgtCwINGB0YLQsNC9INC%2F0L7RiNGC0L7QstC%2B0LPQviDQstGW0LTQv9GA0LDQstC70LXQvdC90Y8sINGJ0L4gPGJyLz4g0YDQvtC30YjRg9C60YPRlNGC0YzRgdGPLCDRgyDQsdGD0LTRjC3Rj9C60LjQuSDQt9GA0YPRh9C90LjQuSDQtNC70Y8g0JLQsNGBINGH0LDRgS4gPGJyIC8%2BIDxiciAvPiZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO9CG0L3RhNC%2B0YDQvNCw0YbRltGOINC80L7QttC90LAg0L7RgtGA0LjQvNCw0YLQuCDQv9GA0L46IDxiciAvPmQCAw9kFggCAQ8WAh8DBY0TJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7LSDQstC90YPRgtGA0ZbRiNC90ZYg0YDQtdGU0YHRgtGA0L7QstCw0L3RliDQv9C%2B0YjRgtC%2B0LLRliDQstGW0LTQv9GA0LDQstC70LXQvdC90Y8sINGJ0L4g0L%2FQtdGA0LXRgdC40LvQsNGO0YLRjNGB0Y8g0LIg0LzQtdC20LDRhSDQo9C60YDQsNGX0L3QuDs8YnIvPg0KICAgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7LSDQvNGW0LbQvdCw0YDQvtC00L3RliDRgNC10ZTRgdGC0YDQvtCy0LDQvdGWINC%2F0L7RiNGC0L7QstGWINCy0ZbQtNC%2F0YDQsNCy0LvQtdC90L3Rjywg0YnQviDQv9C10YDQtdGB0LjQu9Cw0Y7RgtGM0YHRjyDQt9CwINC80LXQttGWINCj0LrRgNCw0ZfQvdC4Ozxici8%2BDQogICAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDstINC80ZbQttC90LDRgNC%2B0LTQvdGWINGA0LXRlNGB0YLRgNC%2B0LLQsNC90ZYg0L%2FQvtGI0YLQvtCy0ZYg0LLRltC00L%2FRgNCw0LLQu9C10L3QvdGPLCDRidC%2BINC90LDQtNGW0LnRiNC70Lgg0LIg0KPQutGA0LDRl9C90YMuPGJyLz48YnIvPg0KICAgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A70KPQstC10LTRltGC0YwsINCx0YPQtNGMLdC70LDRgdC60LAsINCx0LXQtyDQv9GA0L7Qv9GD0YHQutGW0LImbmJzcDsg0YLQsCDRltC90YjQuNGFINGB0LjQvNCy0L7Qu9GW0LIg0L%2FQvtCy0L3QuNC5ICZuYnNwOzxiPjEzLdGB0LjQvNCy0L7Qu9GM0L3QuNC5PC9iPiDQsdGD0LrQstC10L3Qvi3RhtC40YTRgNC%2B0LLQuNC5INC90L7QvNC10YAgKNGI0YLRgNC40YXQutC%2B0LTQvtCy0LjQuSDRltC00LXQvdGC0LjRhNGW0LrQsNGC0L7RgCkg0L%2FQvtGI0YLQvtCy0L7Qs9C%2BINCy0ZbQtNC%2F0YDQsNCy0LvQtdC90L3Rjywg0Y%2FQutC40Lkg0LfQsNC30L3QsNGH0LXQvdC%2BJm5ic3A7INC90LAmbmJzcDsg0JLQsNGI0L7QvNGDJm5ic3A7INGA0L7Qt9GA0LDRhdGD0L3QutC%2B0LLQvtC80YMmbmJzcDsg0LTQvtC60YPQvNC10L3RgtGWJm5ic3A7ICjQutCw0YHQvtCy0L7QvNGDINGH0LXQutGDLCDRgNC%2B0LfRgNCw0YXRg9C90LrQvtCy0ZbQuSDQutCy0LjRgtCw0L3RhtGW0Zcg0YLQvtGJ0L4pINGC0LAg0L3QsNGC0LjRgdC90ZbRgtGMINC90LAg0LrQvdC%2B0L%2FQutGDIMKr0J%2FQvtGI0YPQusK7INCw0LHQviDQutC70LDQstGW0YjRgyDCq0VudGVywrsuPGJyLz48YnIvPg0KICAgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A70IbQtNC10L3RgtC40YTRltC60LDRgtC%2B0YAmbmJzcDsg0LzRltC20L3QsNGA0L7QtNC90L7Qs9C%2BINC%2F0L7RiNGC0L7QstC%2B0LPQviDQstGW0LTQv9GA0LDQstC70LXQvdC90Y8g0LzRltGB0YLQuNGC0YwgMTMg0YHQuNC80LLQvtC70ZbQsiwg0Lcg0L3QuNGFOiAxLdC5INGC0LAgMi3QuSDRgdC40LzQstC%2B0LvQuCDigJQg0LHRg9C60LLQuDsg0LcgMy3Qs9C%2BINC%2F0L4gMTEt0Lkg4oCUINGG0LjRhNGA0Lg7IDEyLdC5INGC0LAgMTMt0Lkg4oCUINCx0YPQutCy0LgsINGP0LrRliDQstGW0LTQvtCx0YDQsNC20LDRjtGC0Ywg0LrQvtC0INC60YDQsNGX0L3QuC3QstGW0LTQv9GA0LDQstC90LjQutCwICjQvdCw0L%2FRgNC40LrQu9Cw0LQsIFVBIOKAlCDQo9C60YDQsNGX0L3QsCwgUlUg4oCUINCg0L7RgdGW0Y8sIFVTIOKAlCDQodCo0JAsIElMIOKAlCDQhtC30YDQsNGX0LvRjCDRgtC%2B0YnQvikuPGJyLz48YnIvPg0KICAgJm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A7Jm5ic3A70IbQtNC10L3RgtC40YTRltC60LDRgtC%2B0YAg0LLQvdGD0YLRgNGW0YjQvdGM0L7Qs9C%2BINC%2F0L7RiNGC0L7QstC%2B0LPQviDQstGW0LTQv9GA0LDQstC70LXQvdC90Y8g0YHQutC70LDQtNCw0ZTRgtGM0YHRjyDQtyAxMyDRhtC40YTRgC48YnIvPjxici8%2BDQogICAmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDsmbmJzcDvQn9GA0LjQutC70LDQtCDQvdC%2B0LzQtdGA0LAg0LzRltC20L3QsNGA0L7QtNC90L7Qs9C%2BINCy0ZbQtNC%2F0YDQsNCy0LvQtdC90L3RjzogIENBMTIzNDU2Nzg5VUEgPGJyLz4NCiAgICZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwOyZuYnNwO9Cy0L3Rg9GC0YDRltGI0L3RjNC%2B0LPQviDQstGW0LTQv9GA0LDQstC70LXQvdC90Y86ICAwMTIzNDU2Nzg5MTIzZAIFDw8WAh8CBQrQn9C%2B0YjRg9C6ZGQCCQ9kFgJmD2QWAgIBDw8WAh8CBT%2FQl9Cw0YfQtdC60LDQudGC0LUsINCS0LDRiCDQt9Cw0L%2FQuNGCINC%2B0LHRgNC%2B0LHQu9GP0ZTRgtGM0YHRjyFkZAILDxYCHwMFmwLQhtC90YTQvtGA0LzQsNGG0ZbRjyDQv9GA0L4g0L3QsNGP0LLQvdGW0YHRgtGMINGC0LAg0YHRgtCw0L0g0L%2FQtdGA0LXRgdC40LvQsNC90L3RjyAg0L%2FQvtGI0YLQvtCy0LjRhSDQstGW0LTQv9GA0LDQstC70LXQvdGMINC%2F0L7RgdGC0ZbQudC90L4g0L7QvdC%2B0LLQu9GO0ZTRgtGM0YHRjyDQuSDQt9Cx0LXRgNGW0LPQsNGU0YLRjNGB0Y8g0LIg0YHQuNGB0YLQtdC80ZYg0L%2FRgNC%2B0YLRj9Cz0L7QvCA2INC80ZbRgdGP0YbRltCyINC3INC80L7QvNC10L3RgtGDINGA0LXRlNGB0YLRgNCw0YbRltGXZGTCkbz1y7PQThxiRimSt4almYGvlQ%3D%3D&ctl00%24centerContent%24txtBarcode=$id&__ASYNCPOST=true&ctl00%24centerContent%24btnFindBarcodeInfo=%D0%9F%D0%BE%D1%88%D1%83%D0%BA";
+		$url="http://services.ukrposhta.com/barcodesingle/default.aspx?ctl00%24centerContent%24scriptManager=ctl00%24centerContent%24scriptManager%7Cctl00%24centerContent%24btnFindBarcodeInfo&__EVENTTARGET=&__EVENTARGUMENT=&ctl00%24centerContent%24txtBarcode=$id&__ASYNCPOST=true&ctl00%24centerContent%24btnFindBarcodeInfo=%D0%9F%D0%BE%D1%88%D1%83%D0%BA";
 		$a= $http->http_request(array('url'=>$url,'return'=>'array', 'cookie'=>true));
 		$cookie = $a['headers']['SET-COOKIE'];
 		$url="http://services.ukrposhta.com/barcodesingle/DownloadInfo.aspx";
 		$data= $http->http_request(array('url'=>$url, 'cookie'=>$cookie));
 		
-		$page=split("\n",$data);
+		$page=preg_split("\n",$data);
 		$print=0;
 		foreach($page as $line){
 			if($print){
@@ -953,8 +729,6 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 
 					$hrs->save();
 				}
-//				$date= strtotime($date);
-//				$model->makeRequest('gibdd',$date);
 			}else{
 				//do nothing
 			}
@@ -988,47 +762,10 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 				$this->redirect(array('view','id'=>$model->ID));
 	}
 	
-	public function actionSentMany($holes)
-	{		
-		$holesmodels=Holes::model()->findAllByPk(explode(',',$holes));
-		$count=0;
-		$links=Array();
-		foreach ($holesmodels as $model){
-			if ($model->makeRequest('gibdd')) {
-				$count++;
-				$links[]=CHtml::link($model->ADDRESS,Array('view','id'=>$model->ID));
-				}
-		}		
-		if($count) Yii::app()->user->setFlash('user', 'Успешное изменение статуса ям: <br/>'.implode('<br/>',$links).'<br/><br/><br/>');
-		else Yii::app()->user->setFlash('user', 'Произошла ошибка! Ни одной ямы не изменено');
-		if(!isset($_GET['ajax']))
-			$this->redirect(array('personal'));
-	}		
-	
-	public function actionProsecutorsent($id)
-	{
-		$model=$this->loadModel($id);
-		$model->makeRequest('prosecutor');
-			if(!isset($_GET['ajax']))
-				$this->redirect(array('view','id'=>$model->ID));
-	}
-	
-	public function actionProsecutornotsent($id)
-	{
-		$model=$this->loadModel($id);
-		$model->updateRevokep();
-			if(!isset($_GET['ajax']))
-				$this->redirect(array('view','id'=>$model->ID));
-	}		
-	
 	public function actionNotsent($id)
 	{
 		$model=$this->loadModel($id);
 		$model->updateRevoke();
-		$hrs = HoleRequestSent::model()->find("hole_id=:id and user_id=:user_id",array(":id"=>$id,":user_id"=>Yii::app()->user->id));
-		if($hrs != null){
-			$hrs->delete();
-		}
 			if(!isset($_GET['ajax']))
 				$this->redirect(array('view','id'=>$model->ID));
 	}	
@@ -1095,7 +832,7 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 			'user'=>$user
 		));
 	}
-	
+	//разобраться со значением функции
 	public function actionSelectHoles($del=false)
 	{
 		$gibdds=Array();
@@ -1162,7 +899,7 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 		));
 	}		
 	
-	public function actionMap()
+	public function actionMap2()
 	{
 		$this->layout='//layouts/header_blank';
 	
@@ -1177,7 +914,31 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 			'types'=>HoleTypes::model()->findAll(Array('condition'=>'t.published=1 and t.lang="ua"')),
 		));
 	}
+	public function actionMap()
+	{
+		$this->layout='//layouts/header_blank';
 	
+		$model=new Holes('search');
+		$model->unsetAttributes();  // clear any default values
+		if(isset($_POST['Holes']))
+			$model->attributes=$_POST['Holes'];
+			if ($model->ADR_CITY=="Город") $model->ADR_CITY='';
+
+		$hole = new Holes;
+		//выставляем центр на карте по координатам IP юзера
+		$request = new CHttpRequest;
+		$geoIp = new EGeoIP();
+		$geoIp->locate($request->userHostAddress); 	
+		//echo ($request->userHostAddress);
+		if ($geoIp->longitude) $hole->LATITUDE=$geoIp->longitude;
+		if ($geoIp->latitude) $hole->LONGITUDE=$geoIp->latitude;
+
+		$this->render('map',array(
+			'model'=>$model,
+			'hole'=>$hole,
+			'types'=>HoleTypes::model()->findAll(Array('condition'=>'t.published=1 and t.lang="ua"')),
+		));
+	}
 	public function actionAjaxMap()
 	{
 		$criteria=new CDbCriteria;
@@ -1279,7 +1040,8 @@ $photos =$photos."<tr><td colspan=2>".Yii::t('holes_view', 'PICTURE').' '.$pnum.
 				);				
 				
 		}
-		echo $_GET['jsoncallback'].'({"clusters": '.CJSON::encode($clusters).', "markers": '.CJSON::encode($markers).' })';
+//		echo $_GET['jsoncallback'].'({"clusters": '.CJSON::encode($clusters).', "markers": '.CJSON::encode($markers).' })';
+		echo '{"clusters": '.CJSON::encode($clusters).', "markers": '.CJSON::encode($markers).' }';
 		
 		
 		Yii::app()->end();		

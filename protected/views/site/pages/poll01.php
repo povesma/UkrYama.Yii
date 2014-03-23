@@ -1,6 +1,6 @@
 <?php
 	$canvote=1;
-	$this->pageTitle=Yii::app()->name . ' :: Say what you think';
+
 	if(count($_POST)){
 		$data = $_POST;
 		if(Yii::app()->user->id){

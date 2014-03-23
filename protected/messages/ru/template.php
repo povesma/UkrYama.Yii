@@ -49,6 +49,7 @@ return array(
  
    'RESULT_OF_REQUESTS'=>'Результаты запроса в ГАИ (анкета)',
    'COMMENTS'=>'Комментарии',
+   'COMMENT'=>'Комментарий: ',
    'NOCOMMENTS'=>'Нет комментариев',
    'COMMENTS_IF_NEED'=>'Комментарии (по желанию)',
    
@@ -95,7 +96,7 @@ return array(
    'DATE_CANT_BE_FUTURE'=>'{attribute} не может быть в будущем',
    'DATE_CANT_BE_PAST'=>'{attribute} устаревшая, выберите другую дату',
    
-   'INFO_NEED_ADD_SCAN_RESPONSE'=>'Необходимо добавить отсканированный ответ из ГАИ',
+   'INFO_NEED_ADD_SCAN_RESPONSE'=>'Необходимо добавить отсканированный ответ',
    'INFO_RESULT_OF_RESPONSE'=>'Фактический результат запроса',
    'INFO_UPLOADPICT_FIX'=>'Желательно добавить фотографии исправленного дефекта',
    'INFO_UPLOADPICT'=>'Нужно загрузить фотографии',

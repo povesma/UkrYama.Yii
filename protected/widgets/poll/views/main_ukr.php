@@ -76,10 +76,10 @@ function validator(form){
 <div id="tpoll01">
 <table id="poll01">
 <thead><tr><td>
-<div><p>Нажаль, нема ефективних електронних засобів доставки офіційних скарг та заяв на стан доріг.
-Єдиний дієвий засіб - гарантована доставка паперового документу особисто або поштою.</p>
-<p>Багато користувачів сайту завантажують недоліки на сайт, проте не відправляють листа в ДАІ з різних причин. 
-Ми плануємо робити це за дорученням користувачів за плату. Розраховуємо, що в такому випадку буде більше відправлених скарг, 
+<div><p>Нажаль, нема ефективних електроннів засобів доставки офіційних скарг та заяв на стан доріг.
+Єдиний дієвий спосіб - гарантован доставка паперового документу особисто або поштою.</p>
+<p>Багато користувачів сайту завантажують недоліки на сат, проте не відправляють листа в ДАІ з різних причин. 
+Ми плануємо робити це за дорученням користувачів за плату. Розраховуємо, що в такому випадку буде більше відправлених скарг, відтак
 відтак більше виправлених недоліків доріг.</p>
 <p>Просимо відповісти на кілька питань, щоб зрозуміти, як нам це найкраще зробити. 
 Ваша думка важлива для нас.</p></div>
@@ -91,7 +91,7 @@ function validator(form){
 	<tr><td>Ваш e-mail<span class="required">*</span> <input type=text name="email"> Ваше им'я<span class="required">*</span> <input type=text name="first_name"></td></tr>
 	<tr><td></td></tr>
 <?php } ?>
-	<tr><td><b>Чи готові ви роздрукувати заяву та відправити її в ДАІ рекомендованим листом звичаною поштою?</b></td><tr>
+	<tr><td><b>Чи готові ви роздрукувати заяві та відправити його в ДАІ рекомендованим листо звичаною поштою?</b></td><tr>
 	<tr><td style="padding-left:60px;">
 		<input type=radio name=group1 id="group1_yes" value="yes" onChange="if(this.checked){fcount.style['display']='inline';ifcount.style['display']='inline';}"><span class="point" onClick="group1_yes.checked=true;fcount.style['display']='inline';ifcount.style['display']='inline';"> &nbsp;Так &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 		<input type=radio name=group1 value="no" id="group1_no" onChange="if(this.checked){fcount.style['display']='none';ifcount.style['display']='none';}"><span class="point" onClick="group1_no.checked=true;fcount.style['display']='none';ifcount.style['display']='none';"> &nbsp;Ні</span></td></tr>
@@ -101,17 +101,17 @@ function validator(form){
 	<tr><td>
 		<ul>
 			<li><input name="ch[8]" id=ch_8 type=checkbox><span onClick="if(ch_8.checked){ch_8.checked=false}else{ch_8.checked=true}"> &nbsp;а що, треба відправляти?!</span></li>
-			<li><input name="ch[0]" id="ch_0" type=checkbox><span onClick="if(ch_0.checked){ch_0.checked=false}else{ch_0.checked=true}"> &nbsp;не хочу вказувати своє им'я чи адресу</span></li>
-			<li><input name="ch[1]" id="ch_1" type=checkbox><span onClick="if(ch_1.checked){ch_1.checked=false}else{ch_1.checked=true}"> &nbsp;у меня нема прінтера</span></li>
-			<li><input name="ch[2]" id="ch_2" type=checkbox><span onClick="if(ch_2.checked){ch_2.checked=false}else{ch_2.checked=true}"> &nbsp;нема часу ходити на пошту</span></li>
-			<li><input name="ch[3]" id="ch_3" type=checkbox><span onClick="if(ch_3.checked){ch_3.checked=false}else{ch_3.checked=true}"> &nbsp;не знаю, як підписувати конверт</span></li>
-			<li><input name="ch[4]" id="ch_4" type=checkbox><span onClick="if(ch_4.checked){ch_4.checked=false}else{ch_4.checked=true}"> &nbsp;не знаю, як оформити відтправку рекомендованим листом</span></li>
-			<li><input name="ch[5]" id="ch_5" type=checkbox><span onClick="if(ch_5.checked){ch_5.checked=false}else{ch_5.checked=true}"> &nbsp;це, мабуть, дорого</span></li>
-			<li><input name="ch[6]" id="ch_6" type=checkbox><span onClick="if(ch_6.checked){ch_6.checked=false}else{ch_6.checked=true}"> &nbsp;це занадто складно!</span></li>
+			<li><input name="ch[0]" id="ch_0" type=checkbox><span onClick="if(ch_0.checked){ch_0.checked=false}else{ch_0.checked=true}"> &nbsp;не хочу указывать свое имя или адрес</span></li>
+			<li><input name="ch[1]" id="ch_1" type=checkbox><span onClick="if(ch_1.checked){ch_1.checked=false}else{ch_1.checked=true}"> &nbsp;у меня нет принтера</span></li>
+			<li><input name="ch[2]" id="ch_2" type=checkbox><span onClick="if(ch_2.checked){ch_2.checked=false}else{ch_2.checked=true}"> &nbsp;нет времени ходить на почту</span></li>
+			<li><input name="ch[3]" id="ch_3" type=checkbox><span onClick="if(ch_3.checked){ch_3.checked=false}else{ch_3.checked=true}"> &nbsp;не знаю, как подписывать конверт</span></li>
+			<li><input name="ch[4]" id="ch_4" type=checkbox><span onClick="if(ch_4.checked){ch_4.checked=false}else{ch_4.checked=true}"> &nbsp;не знаю, как оформлять отправку заказным письмом</span></li>
+			<li><input name="ch[5]" id="ch_5" type=checkbox><span onClick="if(ch_5.checked){ch_5.checked=false}else{ch_5.checked=true}"> &nbsp;это, наверное, дорого</span></li>
+			<li><input name="ch[6]" id="ch_6" type=checkbox><span onClick="if(ch_6.checked){ch_6.checked=false}else{ch_6.checked=true}"> &nbsp;это все слишком сложно</span></li>
 			<li><input name="ch[7]" id="ch_7" type=checkbox onChange="if(this.checked) {ownr02.style['display']='inline'}else{ownr02.style['display']='none'}"><span onClick="if(ch_7.checked){ch_7.checked=false;ownr02.style['display']='none'}else{ch_7.checked=true;ownr02.style['display']='inline'}"> &nbsp;своя причина</span> <input name="ownr02" id="ownr02" style="display:none"></li>
 		</ul>
 		</td></tr>
-	<tr><td><b>Якщо б сайт пропонував відправки скарги чи заяви на стан дороги від імені УкрЯми, з подальшим скануванням відповіді,
+	<tr><td><b>Якщо б сайт пропонував відправки скарги чи заяви на стан дороги ві імені УкрЯми, з подальшим скануванням відповіді,
 та відправкою вам, скільки б ви були готові заплатити за це?</b></td></tr>
 	<tr><td><span class="sub">min</span> <input name="money" type=range min=1 max=75 value=15 onChange="range.innerText=this.value"> <span class="sub">max</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b name=range id=range>15</b> грн. (<i><a href="javascript:void(0);" onClick="if(ownr03.style['display']=='none') {ownr03.style['display']='inline'}else{ownr03.style['display']='none'}"> свій варіант</a></i> <input name="ownr03" id="ownr03" style="display:none">)</td></tr>
 	<tr><td style="padding-right:60px; float:right;"><input type="submit" value="Я так думаю"></td></tr>

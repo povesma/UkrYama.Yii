@@ -1,4 +1,4 @@
-<?php
+pf<?php
 $this->breadcrumbs=array(
 	'Holes'=>array('index'),
 	'Manage',
@@ -66,14 +66,9 @@ $this->widget('zii.widgets.grid.CGridView', array(
 			'value'=>'$data->ID',
 		),
 		array(       
-            'name'=>'ADR_SUBJECTRF',
-            'value'=>'$data->subject ? $data->subject->name_full : "-"',
+            'name'=>'region_id',
+            'value'=>'$data->subject ? $data->subject->name : "-"',
         ),        
-		'ADR_CITY',		
-		array(       
-            'name'=>'gibdd_id',
-            'value'=>'$data->gibdd ? $data->gibdd->name : "-"',
-        ),
 		array(       
             'name'=>'username',
             'value'=>'$data->user->username',
@@ -81,7 +76,7 @@ $this->widget('zii.widgets.grid.CGridView', array(
         array(       
             'name'=>'TYPE_ID',
             'value'=>'$data->type->name',
-            'filter'=>CHtml::listData( HoleTypes::model()->findAll(Array('order'=>'ordering')), 'id', 'name' ),
+            'filter'=>CHtml::listData( HoleTypes::model()->findAll(), 'id', 'name' ),
         ),
         array(       
             'name'=>'STATE',

@@ -58,7 +58,7 @@ class XmlController extends Controller
 			$model->USER_ID=$user->id;
 			}
 		if ($id) $model->ID=(int)$id;
-		if (Yii::app()->request->getParam('filter_rf_subject_id')) $model->ADR_SUBJECTRF=(int)Yii::app()->request->getParam('filter_rf_subject_id');
+		if (Yii::app()->request->getParam('filter_rf_subject_id')) $model->region_id=(int)Yii::app()->request->getParam('filter_rf_subject_id');
 		if (Yii::app()->request->getParam('filter_city')) $model->ADR_CITY=Yii::app()->request->getParam('filter_city');
 		if (Yii::app()->request->getParam('filter_status')) $model->STATE=Yii::app()->request->getParam('filter_status');
 		if (Yii::app()->request->getParam('filter_type')) $model->type_alias=Yii::app()->request->getParam('filter_type');
@@ -78,7 +78,7 @@ class XmlController extends Controller
 		$tags[]=CHtml::closeTag('sort');
 		$tags[]=CHtml::tag('filter', array (), false, false);
 			$tags[]=CHtml::tag('item', array ('code'=>'PREMODERATED'), CHtml::encode($model->PREMODERATED), true);
-			$tags[]=CHtml::tag('item', array ('code'=>'filter_rf_subject_id'), CHtml::encode($model->ADR_SUBJECTRF), true);
+			$tags[]=CHtml::tag('item', array ('code'=>'filter_rf_subject_id'), CHtml::encode($model->region_id), true);
 			$tags[]=CHtml::tag('item', array ('code'=>'filter_city'), CHtml::encode($model->ADR_CITY), true);
 			$tags[]=CHtml::tag('item', array ('code'=>'filter_status'), CHtml::encode($model->STATE), true);
 			$tags[]=CHtml::tag('item', array ('code'=>'filter_type'), CHtml::encode($model->type_alias), true);			
@@ -99,7 +99,7 @@ class XmlController extends Controller
 					$tags[]=CHtml::closeTag('username');
 					$tags[]=CHtml::tag('latitude', array (), CHtml::encode($hole->LATITUDE), true);
 					$tags[]=CHtml::tag('longitude', array (), CHtml::encode($hole->LONGITUDE), true);
-					$tags[]=CHtml::tag('address', array ('city'=>$hole->ADR_CITY, 'subjectrf'=>$hole->ADR_SUBJECTRF), CHtml::encode(($hole->subject ? $hole->subject->name_full.', ' : '') .$hole->ADR_CITY.', '.$hole->ADDRESS), true);
+					$tags[]=CHtml::tag('address', array ('city'=>$hole->ADR_CITY, 'subjectrf'=>$hole->region_id), CHtml::encode(($hole->subject ? $hole->subject->name_full.', ' : '') .$hole->ADR_CITY.', '.$hole->ADDRESS), true);
 					$tags[]=CHtml::tag('state', array ('code'=>$hole->STATE), CHtml::encode($hole->StateName), true);
 					$tags[]=CHtml::tag('type', array ('code'=>$hole->type->alias), CHtml::encode($hole->type->name), true);
 					$tags[]=CHtml::tag('datecreated', array ('readable'=>date('d.m.Y',$hole->DATE_CREATED)), CHtml::encode($hole->DATE_CREATED), true);
@@ -280,7 +280,6 @@ class XmlController extends Controller
 			}
 		
 		$addressArr    = RfSubjects::model()->Address($address);
-//		echo $addressArr['subject_rf'].":".$addressArr['city'].":".$addressArr['address']; exit;
 		$subject_rf = $addressArr['subject_rf'];
 		$city       = $addressArr['city'];
 		$address    = $addressArr['address'];
@@ -303,7 +302,7 @@ class XmlController extends Controller
 		$model=new Holes;		
 		$model->USER_ID=$user->id;	
 		$model->DATE_CREATED=time();
-		$model->ADR_SUBJECTRF=$subject_rf;
+		$model->region_id=$subject_rf;
 		$model->ADR_CITY=trim($city);
 		$model->ADDRESS=trim($address);
 		if ($user->level > 50) $model->PREMODERATED=1;
@@ -373,7 +372,7 @@ class XmlController extends Controller
 		$tags=Array();
 
 		if ($address) {
-		$model->ADR_SUBJECTRF=$subject_rf;
+		$model->region_id=$subject_rf;
 		$model->ADR_CITY=trim($city);
 		$model->ADDRESS=trim($address);
 		}
@@ -518,7 +517,7 @@ class XmlController extends Controller
 			case 'pdf_gibdd':
 			{
 				$attribs=Array(				
-				'to'=>Yii::app()->request->getParam('to'),
+				'to_name'=>Yii::app()->request->getParam('to'),
 				'from'=>Yii::app()->request->getParam('from'),
 				'postaddress'=>Yii::app()->request->getParam('postaddress'),
 				'address'=>Yii::app()->request->getParam('holeaddress') ? Yii::app()->request->getParam('holeaddress') : $model->ADDRESS,

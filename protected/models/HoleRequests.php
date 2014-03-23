@@ -38,8 +38,7 @@ class HoleRequests extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-//			array('hole_id, user_id, gibdd_id, date_sent, ref', 'required'),
-			array('hole_id, user_id, gibdd_id, date_sent', 'required'),
+			array('hole_id, user_id, gibdd_id, date_sent, ref', 'required'),
 			array('hole_id, user_id, gibdd_id, date_sent', 'numerical', 'integerOnly'=>true),
 			array('type', 'length', 'max'=>30),
 			// The following rule is used by search().
@@ -58,10 +57,12 @@ class HoleRequests extends CActiveRecord
 		return array(
 			'answer'=>array(self::HAS_ONE, 'HoleAnswers', 'request_id','order'=>'date DESC'),
 			'answers'=>array(self::HAS_MANY, 'HoleAnswers', 'request_id','order'=>'date DESC'),
+			'no_answer'=>array(self::HAS_ONE, 'HoleAnswers', 'request_id','condition'=>'no_answer.id is null and DATE(FROM_UNIXTIME(`date_created`)) < (curdate() - interval 40 day)'),
 			'hole'=>array(self::BELONGS_TO, 'Holes', 'hole_id'),
 			'user'=>array(self::BELONGS_TO, 'UserGroupsUser', 'user_id'),
 			'auth_ru'=>array(self::BELONGS_TO,'Authority','gibdd_id','condition'=>'lang="ru"'),
 			'auth_ua'=>array(self::BELONGS_TO,'Authority','gibdd_id','condition'=>'lang="ua"'),
+			'req_sent'=>array(self::HAS_ONE, 'HoleRequestSent', 'req'),
 		);
 	}
 	
@@ -75,7 +76,7 @@ class HoleRequests extends CActiveRecord
 			'id' => 'ID',
 			'hole_id' => 'Hole',
 			'user_id' => 'User',
-			'gibdd_id' => 'Gibdd',
+			'gibdd_id' => 'Auth ID',
 			'date_sent' => 'Date Sent',
 			'type' => 'Type',
 		);
@@ -87,6 +88,7 @@ class HoleRequests extends CActiveRecord
 	}
 	
 	public function afterDelete(){
+/*
 		if (!count ($this->findAll('hole_id='.$this->hole_id.' AND type="'.$this->type.'"'))){
 			if ($this->type=='gibdd') {
 				$this->hole->STATE='inprogress';				
@@ -97,7 +99,8 @@ class HoleRequests extends CActiveRecord
 				$this->hole->DATE_SENT_PROSECUTOR=null;
 				$this->hole->update();
 			}			
-		}	
+		}
+*/
 		return true;	
 	}		
 

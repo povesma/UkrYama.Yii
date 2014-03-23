@@ -41,11 +41,6 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'DATE_SENT'); ?>
-		<?php echo $form->textField($model,'DATE_SENT',array('size'=>10,'maxlength'=>10)); ?>
-	</div>
-
-	<div class="row">
 		<?php echo $form->label($model,'DATE_STATUS'); ?>
 		<?php echo $form->textField($model,'DATE_STATUS',array('size'=>10,'maxlength'=>10)); ?>
 	</div>
@@ -66,13 +61,8 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'ADR_SUBJECTRF'); ?>
-		<?php echo $form->textField($model,'ADR_SUBJECTRF',array('size'=>10,'maxlength'=>10)); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'gibdd_id'); ?>
-		<?php echo $form->textField($model,'gibdd_id'); ?>
+		<?php echo $form->label($model,'region_id'); ?>
+		<?php echo $form->textField($model,'region_id',array('size'=>10,'maxlength'=>10)); ?>
 	</div>
 
 	<div class="row">
@@ -81,23 +71,8 @@
 	</div>
 
 	<div class="row">
-		<?php echo $form->label($model,'COMMENT_GIBDD_REPLY'); ?>
-		<?php echo $form->textArea($model,'COMMENT_GIBDD_REPLY',array('rows'=>6, 'cols'=>50)); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'GIBDD_REPLY_RECEIVED'); ?>
-		<?php echo $form->textField($model,'GIBDD_REPLY_RECEIVED'); ?>
-	</div>
-
-	<div class="row">
 		<?php echo $form->label($model,'PREMODERATED'); ?>
 		<?php echo $form->textField($model,'PREMODERATED'); ?>
-	</div>
-
-	<div class="row">
-		<?php echo $form->label($model,'DATE_SENT_PROSECUTOR'); ?>
-		<?php echo $form->textField($model,'DATE_SENT_PROSECUTOR',array('size'=>10,'maxlength'=>10)); ?>
 	</div>
 
 	<div class="row buttons">

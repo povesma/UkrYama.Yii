@@ -15,6 +15,12 @@ class WebUserGroups extends CWebUser
 	public $loginUrl = array('/userGroups/');
     private $_language;
 
+	public function init(){
+		if (Yii::app() instanceof CConsoleApplication) {
+			return true;
+		}
+		parent::init();
+	}
 	/**
 	 * updates the identity of the user
 	 * @param string $id

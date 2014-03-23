@@ -157,22 +157,24 @@ EOD
 		<p class="long">
 			<label class="fc">Область</label>
 			<?php
+
  $this->widget('EJuiAutoCompleteFkField', array(
       'model'=>$model, 
-      'attribute'=>'ADR_SUBJECTRF', //the FK field (from CJuiInputWidget)
+      'attribute'=>'region_id', //the FK field (from CJuiInputWidget)
       // controller method to return the autoComplete data (from CJuiAutoComplete)
-      'sourceUrl'=>Yii::app()->createUrl('/holes/findSubject'), 
+      'sourceUrl'=>Yii::app()->createUrl('/holes/findRegion'), 
       // defaults to false.  set 'true' to display the FK field with 'readonly' attribute.
       'showFKField'=>false,
        // display size of the FK field.  only matters if not hidden.  defaults to 10
       'FKFieldSize'=>15, 
       'relName'=>'subject', // the relation name defined above
-      'displayAttr'=>'name_full',  // attribute or pseudo-attribute to display
+      'displayAttr'=>'name',  // attribute or pseudo-attribute to display
       // length of the AutoComplete/display field, defaults to 50  
       'autoCompleteLength'=>60,
       // any attributes of CJuiAutoComplete and jQuery JUI AutoComplete widget may 
       // also be defined.  read the code and docs for all options
-      'cssClass'=>$model->ADR_SUBJECTRF ? '' : 'disabled',
+//      'cssClass'=>$model->region_id ? '' : 'disabled',
+      'cssClass'=>'disabled',
       
       //'scriptFile'=>'jquery.autocomplete.js',      
       'options'=>array(
@@ -182,6 +184,7 @@ EOD
           
       ),
  ));
+
  ?>
 			
 			</p>

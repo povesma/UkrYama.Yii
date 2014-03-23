@@ -510,20 +510,19 @@ class UserController extends Controller
 			$formmodel->attributes = $_POST['UserGroupsUser'];
 			$attr='username'; $val=$formmodel->username;
 			if (!$formmodel->username) {$attr='email'; $val=$formmodel->email;}
-			if (!$formmodel->email) {$attr='username'; $val=$formmodel->username;}		
+			if (!$formmodel->email) {$attr='username'; $val=$formmodel->username;}
 			if ($formmodel->username || $formmodel->email) {
-				$model = UserGroupsUser::model()->findByAttributes(array($attr=>$val));			
-					if ($model) {				
+				$model = UserGroupsUser::model()->findByAttributes(array($attr=>$val));
+					if ($model) {
 						$model->scenario = 'passRequest';
-						if ($model->save()) {				
+						if ($model->save()) {
 							$mail = new UGMail($model, UGMail::PASS_RESET);
 							if ($mail->send()) {
-								if(!Yii::app()->user->hasFlash('success'))
-									Yii::app()->user->setFlash('success', Yii::t('UserGroupsModule.general','An email containing the instructions to reset your password has been sent to your email address: {email}'));									
-									}
-							
-						} else {					
-							//print_r ($model->errors); die(); 
+//								if(!Yii::app()->user->hasFlash('success'))
+//									Yii::app()->user->setFlash('success', Yii::t('UserGroupsModule.general','An email containing the instructions to reset your password has been sent to your email address: {email}'));
+							}
+						} else {
+							//print_r ($model->errors); die();
 							Yii::app()->user->setFlash('success', Yii::t('userGroupsModule.general','An Error Occurred. Please try later.'));
 							}
 						$this->redirect(Array ('/userGroups/'));
@@ -561,30 +560,6 @@ class UserController extends Controller
 	{
 	
 		$service = Yii::app()->request->getQuery('service');
-		/*if (isset($service)) {
-			$authIdentity = Yii::app()->eauth->getIdentity($service);
-			$authIdentity->redirectUrl = Yii::app()->user->returnUrl;
-			$authIdentity->cancelUrl = $this->createAbsoluteUrl('site/login');
-			
-			if ($authIdentity->authenticate()) {
-				$identity = new ServiceUserIdentity($authIdentity);
-				
-				// успешная авторизация
-				if ($identity->authenticate()) {
-					Yii::app()->user->login($identity);
-					
-					// специальное перенаправления для корректного закрытия всплывающего окна
-					$authIdentity->redirect();
-				}
-				else {
-					// закрытие всплывающего окна и перенаправление на cancelUrl
-					$authIdentity->cancel();
-				}
-			}
-			
-			// авторизация не удалась, перенаправляем на страницу входа
-			$this->redirect(array('site/login'));
-		}*/
 		
 		if (isset($service)) {
 			$authIdentity = Yii::app()->eauth->getIdentity($service);

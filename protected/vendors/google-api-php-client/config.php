@@ -30,10 +30,10 @@ $apiConfig = array(
     'oauth2_redirect_uri' => '',
 
     // The developer key, you get this at https://code.google.com/apis/console
-    'developer_key' => 'AIzaSyDsIpvxgMjvNkXDOhxWninnL2zKgm_PoXQ',
+    'developer_key' => 'AIzaSyArxZWZpxJvKGEvhvaakfX0ur9_YTnbqmc',
   
     // Site name to show in the Google's OAuth 1 authentication screen.
-    'site_name' => 'newtest.ukryama.com',
+    'site_name' => 'ukryama.com',
 
     // Which Authentication, Storage and HTTP IO classes to use.
     'authClass'    => 'Google_OAuth2',
